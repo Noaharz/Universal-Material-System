@@ -78,7 +78,7 @@ Properties:
 ## 2. Directory layout
 
 ```
-material/
+universal-material-system/
 ├── ums/                        # Python package (the implementation)
 │   ├── units.py                # 7-dimensional SI units & quantities
 │   ├── parser.py               # shared indentation grammar
@@ -91,13 +91,20 @@ material/
 │   ├── runtime.py              # scenes & material assignments
 │   ├── science.py              # thermal/mechanical solvers, mixing, atomistic
 │   └── cli.py                  # `ums-cli`
+├── cpp/                        # standalone C++20 reader (no dependencies, WASM-ready)
+│   ├── include/ums/            # value, errors, units, parser, serializer, validation,
+│   │                           #   reader, registry, library, fileio
+│   ├── src/                    # core (fs-free) + fileio/library (filesystem)
+│   ├── tools/umsdump.cpp       # inspection CLI
+│   ├── tools/umsconf.cpp       # conformance CLI (parse/canonical/validate/resolve/units)
+│   └── tests/                  # core_test + reader_test (CTest suite)
 ├── library/                    # Phase 5 example library
 │   ├── elements/               # 10 atoms
 │   ├── structures/             # 8 structures
 │   └── materials/              # 9 materials
-├── examples/                   # instances and scenes
+├── examples/                   # elements, structures, materials, instances, scenes
 ├── specification/             # formal format specification (Phase 1)
-└── tests/                      # pytest suite
+└── tests/                      # pytest suite (incl. C++ reader integration)
 ```
 
 ---
@@ -189,7 +196,72 @@ describe the same material at different fidelity. Register your own via
 
 ---
 
-## 5. Development status (Phase plan)
+## 5. C++ reader (`cpp/`)
+
+A standalone, dependency-free **C++20** library that reads all four formats
+(`.atom`, `.structure`, `.material`, `.instance`) with the same grammar as the
+Python parser — intended for embedding in engines and tools that cannot run
+Python, including **WebAssembly**. It mirrors the Python reference: the same
+unit system (`Quantity`, compound units such as `W/(m*K)`), a serializer that
+writes byte-for-byte the same canonical text, and the same validation rules.
+
+Key pieces:
+
+- `value.hpp` — generic `Value` tree (null/bool/int/float/string/list/map).
+- `errors.hpp` — `UmsError`, `ParseError` (with **line and column**), `UnitError`, …
+- `units.hpp` — 7-dimension SI vector, `Unit`, `Quantity`, `parse_unit`, `parse_quantity`.
+- `parser.hpp` — buffer-based (`parse_buffer` / `parse_document(std::string_view)`), no I/O.
+- `serializer.hpp` — `serialize_document` reproduces the Python output exactly.
+- `validation.hpp` — `Validator` producing the same codes/severities/paths as Python.
+- `registry.hpp` — fs-free `ResourceRegistry` (IDs, logical paths, dependency graph,
+  cycles, missing references); resolves refs by path **or** stable ID.
+- `reader.hpp` — typed `AtomDefinition`, `StructureDefinition`, `MaterialDefinition`,
+  `MaterialInstance`.
+- `library.hpp`, `fileio.hpp` — filesystem layer (search paths, indexing, `parse_file`).
+
+The entire core is I/O-free and therefore WASM-ready: build with
+`-DUMS_NO_FILESYSTEM=ON` to compile only the buffer/registry/validate/serialize
+core (no `std::filesystem`, no threads).
+
+```bash
+cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release
+cmake --build cpp/build -j4
+ctest --test-dir cpp/build
+
+cpp/build/umsdump library/elements/gold.atom                 # typed summary
+cpp/build/umsdump --lib library --list                       # index a library
+cpp/build/umsdump --lib examples material.copper             # lookup by ID
+cpp/build/umsdump --lib examples --tree structures/titanium_crystal.structure
+
+cpp/build/umsconf canonical library/elements/gold.atom       # deterministic re-serialization
+cpp/build/umsconf validate library/materials/gold.material   # same rules as Python
+cpp/build/umsconf resolve element.gold --lib library         # reference resolution
+cpp/build/umsconf unit "W/(m*K)"                             # unit parsing
+```
+
+```cpp
+#include "ums/library.hpp"
+#include "ums/reader.hpp"
+
+ums::ResourceLibrary library({"library"});
+library.index();
+const ums::Document* doc = library.load("materials/water.material");
+if (doc) {
+    ums::MaterialDefinition water = ums::read_material(*doc);
+    auto density = water.property("Density");
+    for (const auto& ref : water.structure_refs()) { /* ... */ }
+}
+```
+
+Verification is twofold: `tests/test_cpp_reader.py` exercises the reader against
+the real library, and `tests/test_cpp_conformance.py` runs every library/example
+document (plus invalid fixtures) through **both** implementations, asserting
+identical parse results, canonical serialization, validation issues
+(code/severity/path/subject) and unit arithmetic.
+
+---
+
+## 6. Development status (Phase plan)
 
 | Phase | Content | Status |
 | --- | --- | --- |
@@ -201,8 +273,9 @@ describe the same material at different fidelity. Register your own via
 | 6 | Runtime integration (scene assignments, shared definitions, memory optimization) | done (`ums/runtime.py`) |
 | 7 | Scientific extensions (property models, thermal/mechanical solvers, mixing, atomistic state) | done (`ums/science.py`, `ums/models/`) |
 
-## 6. Tests
+## 7. Tests
 
 ```bash
-python -m pytest          # 89 tests
+python -m pytest          # Python suite + C++ reader/conformance integration (102 tests)
+ctest --test-dir cpp/build
 ```

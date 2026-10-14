@@ -41,3 +41,16 @@ htmlcov/
 .Trashes
 Thumbs.db
 desktop.ini
+
+# C / C++ build artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
