@@ -1,0 +1,32 @@
+{
+  "name": "indoor-pool",
+  "description": "Example scene: many objects share a few material definitions.",
+  "instances": {
+    "instance.poolwater": {
+      "id": "instance.poolwater",
+      "name": "PoolWater",
+      "definition_ref": "materials/water.material",
+      "state": { "Temperature": "293 K", "Pressure": "101325 Pa" },
+      "parameters": {}
+    },
+    "instance.oceanwater": {
+      "id": "instance.oceanwater",
+      "name": "OceanWater",
+      "definition_ref": "materials/water.material",
+      "variant": "Seawater",
+      "state": { "Temperature": "285 K" },
+      "parameters": { "Salinity": "35 PSU" }
+    }
+  },
+  "assignments": [
+    { "object": "pool/water_volume", "material": "materials/water.material", "instance": "instance.poolwater" },
+    { "object": "pool/tile/0", "material": "materials/glass.material" },
+    { "object": "pool/tile/1", "material": "materials/glass.material" },
+    { "object": "pool/tile/2", "material": "materials/glass.material" },
+    { "object": "railing/gold_0", "material": "materials/gold.material" },
+    { "object": "railing/gold_1", "material": "materials/gold.material" },
+    { "object": "structure/steel_frame", "material": "materials/steel.material" },
+    { "object": "deck/concrete", "material": "materials/concrete.material" },
+    { "object": "diving_board", "material": "materials/polyethylene.material" }
+  ]
+}

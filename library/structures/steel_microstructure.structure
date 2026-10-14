@@ -1,0 +1,33 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.steel_microstructure"
+    Name: "Steel Microstructure"
+    StructureType: Composite
+
+Composition:
+    - AtomRef: "elements/iron.atom"
+      Ratio: 1
+
+    - AtomRef: "elements/carbon.atom"
+      Ratio: 0.008
+
+Topology:
+    Phases:
+        - Id: Ferrite
+          StructureRef: "structures/iron_crystal.structure"
+          Role: Matrix
+
+        - Id: Cementite
+          StructureRef: "structures/iron_crystal.structure"
+          Role: Precipitate
+
+References:
+    AtomDefinitions:
+        - "elements/iron.atom"
+        - "elements/carbon.atom"
+
+    Substructures:
+        - "structures/iron_crystal.structure"

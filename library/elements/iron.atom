@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.iron"
+    Name: "Iron"
+    Symbol: "Fe"
+    AtomicNumber: 26
+
+Properties:
+    AtomicMass: 55.845 u
+    AtomicRadius: 126 pm
+    CovalentRadius: 132 pm
+    IonizationEnergy: 7.902 eV
+    Electronegativity: 1.83
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d6 4s2"
+    ValenceElectrons: 8
+
+References:
+    DataSource: "periodic_table_reference"

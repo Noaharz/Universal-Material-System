@@ -1,0 +1,27 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.iron"
+    Name: "Iron"
+    Category: "Metal"
+
+Composition:
+    Fe: 100%
+
+Structures:
+    - Ref: "structures/iron_crystal.structure"
+      Role: Crystal
+
+Properties:
+    Density: 7874 kg/m^3
+    ThermalConductivity: 80.4 W/(m*K)
+    ElectricalConductivity: 1.0e7 S/m
+    YoungsModulus: 200 GPa
+    PoissonRatio: 0.29
+    MeltingPoint: 1811 K
+
+References:
+    AtomDefinitions:
+        - "elements/iron.atom"

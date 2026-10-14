@@ -1,0 +1,26 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.iron_crystal"
+    Name: "Iron Crystal"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/iron.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: BCC
+    SpaceGroup: "Im-3m"
+    LatticeParameter: 2.866 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/iron.atom"

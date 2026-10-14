@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.titanium"
+    Name: "Titanium"
+    Symbol: "Ti"
+    AtomicNumber: 22
+
+Properties:
+    AtomicMass: 47.867 u
+    AtomicRadius: 147 pm
+    CovalentRadius: 160 pm
+    IonizationEnergy: 6.828 eV
+    Electronegativity: 1.54
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d2 4s2"
+    ValenceElectrons: 4
+
+References:
+    DataSource: "NIST Atomic Weights and Isotopic Compositions 2021"

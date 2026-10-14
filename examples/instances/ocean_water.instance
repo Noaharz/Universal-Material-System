@@ -1,0 +1,17 @@
+INSTANCE
+
+Version: 1
+
+Identity:
+    Id: "instance.oceanwater"
+    Name: "OceanWater"
+
+Definition: "materials/water.material"
+Variant: "Seawater"
+
+State:
+    Temperature: 285 K
+    Pressure: parameterized
+
+Parameters:
+    Salinity: 35 PSU

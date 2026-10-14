@@ -1,0 +1,44 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.silica_glass"
+    Name: "Silica Glass"
+    StructureType: Amorphous
+
+Composition:
+    - AtomRef: "elements/silicon.atom"
+      Ratio: 1
+
+    - AtomRef: "elements/oxygen.atom"
+      Ratio: 2
+
+Topology:
+    Atoms:
+        - Id: Si1
+          Type: "elements/silicon.atom"
+
+        - Id: O1
+          Type: "elements/oxygen.atom"
+
+        - Id: O2
+          Type: "elements/oxygen.atom"
+
+    Bonds:
+        - From: Si1
+          To: O1
+          Type: Covalent
+
+        - From: Si1
+          To: O2
+          Type: Covalent
+
+Periodicity:
+    Dimensions: 0
+    PeriodicAxes: [false, false, false]
+
+References:
+    AtomDefinitions:
+        - "elements/silicon.atom"
+        - "elements/oxygen.atom"

@@ -1,0 +1,44 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.water"
+    Name: "Water"
+    StructureType: Molecular
+
+Composition:
+    - AtomRef: "elements/hydrogen.atom"
+      Count: 2
+
+    - AtomRef: "elements/oxygen.atom"
+      Count: 1
+
+Topology:
+    Atoms:
+        - Id: H1
+          Type: "elements/hydrogen.atom"
+
+        - Id: O1
+          Type: "elements/oxygen.atom"
+
+        - Id: H2
+          Type: "elements/hydrogen.atom"
+
+    Bonds:
+        - From: H1
+          To: O1
+          Type: Covalent
+
+        - From: O1
+          To: H2
+          Type: Covalent
+
+Geometry:
+    BondAngle: 104.5 deg
+    BondLengthOH: 95.84 pm
+
+References:
+    AtomDefinitions:
+        - "elements/hydrogen.atom"
+        - "elements/oxygen.atom"

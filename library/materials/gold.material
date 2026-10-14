@@ -1,0 +1,29 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.gold"
+    Name: "Gold"
+    Category: "Metal"
+
+Composition:
+    Au: 100%
+
+Structures:
+    - Ref: "structures/gold_crystal.structure"
+      Role: Crystal
+
+Properties:
+    Density: 19300 kg/m^3
+    ThermalConductivity: 318 W/(m*K)
+    ElectricalConductivity: 4.11e7 S/m
+    YoungsModulus: 79 GPa
+    PoissonRatio: 0.44
+    RefractiveIndex: 0.47
+    Reflectivity: 0.95
+    MeltingPoint: 1337.33 K
+
+References:
+    AtomDefinitions:
+        - "elements/gold.atom"

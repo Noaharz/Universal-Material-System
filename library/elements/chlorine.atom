@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.chlorine"
+    Name: "Chlorine"
+    Symbol: "Cl"
+    AtomicNumber: 17
+
+Properties:
+    AtomicMass: 35.45 u
+    AtomicRadius: 99 pm
+    CovalentRadius: 102 pm
+    IonizationEnergy: 12.968 eV
+    Electronegativity: 3.16
+
+Electronic:
+    ElectronConfiguration: "[Ne] 3s2 3p5"
+    ValenceElectrons: 7
+
+References:
+    DataSource: "periodic_table_reference"

@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.nitrogen"
+    Name: "Nitrogen"
+    Symbol: "N"
+    AtomicNumber: 7
+
+Properties:
+    AtomicMass: 14.007 u
+    AtomicRadius: 65 pm
+    CovalentRadius: 71 pm
+    IonizationEnergy: 14.534 eV
+    Electronegativity: 3.04
+
+Electronic:
+    ElectronConfiguration: "[He] 2s2 2p3"
+    ValenceElectrons: 5
+
+References:
+    DataSource: "periodic_table_reference"

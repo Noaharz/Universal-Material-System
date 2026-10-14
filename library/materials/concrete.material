@@ -1,0 +1,24 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.concrete"
+    Name: "Concrete"
+    Category: "Composite"
+
+Composition:
+    Cement: 15%
+    Water: 15%
+    Aggregate: 70%
+
+Properties:
+    Density: 2400 kg/m^3
+    ThermalConductivity: 1.7 W/(m*K)
+    HeatCapacity: 880 J/(kg*K)
+    YoungsModulus: 30 GPa
+    PoissonRatio: 0.20
+    CompressiveStrength: 30 MPa
+
+References:
+    DataSource: "engineering_handbook"

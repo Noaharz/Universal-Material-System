@@ -1,0 +1,30 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.titanium_crystal"
+    Name: "Titanium Crystal"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/titanium.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Hexagonal
+    BravaisLattice: HCP
+    SpaceGroup: "P63/mmc"
+    LatticeParameter: 2.951 angstrom
+    LatticeParameterC: 4.684 angstrom
+    COverA: 1.587
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/titanium.atom"
+
+    DataSource: "CRC Handbook, alpha-Ti lattice constants at 298 K"

@@ -1,0 +1,63 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.water"
+    Name: "Water"
+    Category: "Fluid"
+
+Composition:
+    H2O: 100%
+
+Structures:
+    - Ref: "structures/water.structure"
+      Role: Molecule
+
+Properties:
+    Density:
+        Model: WaterDensity
+
+    HeatCapacity: 4182 J/(kg*K)
+    ThermalConductivity: 0.6 W/(m*K)
+    Viscosity: 0.001 Pa*s
+    RefractiveIndex: 1.333
+    MeltingPoint: 273.15 K
+    BoilingPoint: 373.15 K
+
+Phases:
+    Solid:
+        Max: 273.15 K
+
+    Liquid:
+        Min: 273.15 K
+        Max: 373.15 K
+
+    Gas:
+        Min: 373.15 K
+
+CompositionProfiles:
+    Pure:
+        H2O: 100%
+
+    Seawater:
+        H2O: 96.5%
+        DissolvedSalts: 3.5%
+
+Variants:
+    Distilled:
+        Parameters:
+            Salinity: 0 PSU
+
+    TapWater:
+        Parameters:
+            Salinity: 0.05 PSU
+
+    Seawater:
+        Parameters:
+            Salinity: 35 PSU
+
+References:
+    AtomDefinitions:
+        - "elements/hydrogen.atom"
+        - "elements/oxygen.atom"

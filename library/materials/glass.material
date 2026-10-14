@@ -1,0 +1,33 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.glass"
+    Name: "Soda-Lime Glass"
+    Category: "Glass"
+
+Composition:
+    SiO2: 72%
+    Na2O: 14%
+    CaO: 14%
+
+Structures:
+    - Ref: "structures/silica_glass.structure"
+      Role: Network
+
+Properties:
+    Density: 2500 kg/m^3
+    ThermalConductivity: 1.0 W/(m*K)
+    HeatCapacity: 840 J/(kg*K)
+    YoungsModulus: 70 GPa
+    PoissonRatio: 0.20
+    RefractiveIndex: 1.52
+    SofteningPoint: 1000 K
+
+References:
+    AtomDefinitions:
+        - "elements/silicon.atom"
+        - "elements/oxygen.atom"
+        - "elements/sodium.atom"
+        - "elements/calcium.atom"

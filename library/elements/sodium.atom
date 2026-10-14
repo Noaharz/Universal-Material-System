@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.sodium"
+    Name: "Sodium"
+    Symbol: "Na"
+    AtomicNumber: 11
+
+Properties:
+    AtomicMass: 22.990 u
+    AtomicRadius: 186 pm
+    CovalentRadius: 166 pm
+    IonizationEnergy: 5.139 eV
+    Electronegativity: 0.93
+
+Electronic:
+    ElectronConfiguration: "[Ne] 3s1"
+    ValenceElectrons: 1
+
+References:
+    DataSource: "periodic_table_reference"

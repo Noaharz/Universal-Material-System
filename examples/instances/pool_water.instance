@@ -1,0 +1,13 @@
+INSTANCE
+
+Version: 1
+
+Identity:
+    Id: "instance.poolwater"
+    Name: "PoolWater"
+
+Definition: "materials/water.material"
+
+State:
+    Temperature: 293 K
+    Pressure: 101325 Pa

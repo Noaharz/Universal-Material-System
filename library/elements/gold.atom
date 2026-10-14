@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.gold"
+    Name: "Gold"
+    Symbol: "Au"
+    AtomicNumber: 79
+
+Properties:
+    AtomicMass: 196.96657 u
+    AtomicRadius: 144 pm
+    CovalentRadius: 136 pm
+    IonizationEnergy: 9.226 eV
+    Electronegativity: 2.54
+
+Electronic:
+    ElectronConfiguration: "[Xe] 4f14 5d10 6s1"
+    ValenceElectrons: 1
+
+References:
+    DataSource: "periodic_table_reference"

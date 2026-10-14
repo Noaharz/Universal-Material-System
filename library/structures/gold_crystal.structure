@@ -1,0 +1,26 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.gold_crystal"
+    Name: "Gold Crystal"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/gold.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+    SpaceGroup: "Fm-3m"
+    LatticeParameter: 4.078 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/gold.atom"

@@ -1,0 +1,29 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.copper"
+    Name: "Copper"
+    Category: "Metal"
+
+Composition:
+    Cu: 100%
+
+Structures:
+    - Ref: "structures/copper_crystal.structure"
+      Role: Crystal
+
+Properties:
+    Density: 8960 kg/m^3
+    ThermalConductivity: 401 W/(m*K)
+    ElectricalConductivity: 5.96e7 S/m
+    HeatCapacity: 385 J/(kg*K)
+    YoungsModulus: 110 GPa
+    PoissonRatio: 0.34
+    MeltingPoint: 1357.77 K
+
+References:
+    DataSource: "CRC Handbook of Chemistry and Physics"
+    AtomDefinitions:
+        - "elements/copper.atom"

@@ -1,0 +1,37 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.polyethylene"
+    Name: "Polyethylene"
+    StructureType: Polymer
+
+Composition:
+    - AtomRef: "elements/carbon.atom"
+      Count: 2
+
+    - AtomRef: "elements/hydrogen.atom"
+      Count: 4
+
+Topology:
+    Atoms:
+        - Id: C1
+          Type: "elements/carbon.atom"
+
+        - Id: C2
+          Type: "elements/carbon.atom"
+
+    Bonds:
+        - From: C1
+          To: C2
+          Type: Covalent
+
+Models:
+    RepeatUnit: "C2H4"
+    DegreeOfPolymerization: parameterized
+
+References:
+    AtomDefinitions:
+        - "elements/carbon.atom"
+        - "elements/hydrogen.atom"

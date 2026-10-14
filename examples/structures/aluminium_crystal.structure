@@ -1,0 +1,28 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.aluminium_crystal"
+    Name: "Aluminium Crystal"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/aluminium.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+    SpaceGroup: "Fm-3m"
+    LatticeParameter: 4.0495 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/aluminium.atom"
+
+    DataSource: "CRC Handbook, lattice constant of Al at 293 K"

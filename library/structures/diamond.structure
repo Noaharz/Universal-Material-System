@@ -1,0 +1,26 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.diamond"
+    Name: "Diamond"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/carbon.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+    SpaceGroup: "Fd-3m"
+    LatticeParameter: 3.567 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/carbon.atom"

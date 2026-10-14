@@ -1,0 +1,29 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.aluminium"
+    Name: "Aluminium"
+    Category: "Metal"
+
+Composition:
+    Al: 100%
+
+Structures:
+    - Ref: "structures/aluminium_crystal.structure"
+      Role: Crystal
+
+Properties:
+    Density: 2700 kg/m^3
+    ThermalConductivity: 237 W/(m*K)
+    ElectricalConductivity: 3.77e7 S/m
+    HeatCapacity: 897 J/(kg*K)
+    YoungsModulus: 70 GPa
+    PoissonRatio: 0.35
+    MeltingPoint: 933.47 K
+
+References:
+    DataSource: "CRC Handbook of Chemistry and Physics"
+    AtomDefinitions:
+        - "elements/aluminium.atom"

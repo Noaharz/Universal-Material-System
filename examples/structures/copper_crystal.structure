@@ -1,0 +1,28 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.copper_crystal"
+    Name: "Copper Crystal"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/copper.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+    SpaceGroup: "Fm-3m"
+    LatticeParameter: 3.615 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/copper.atom"
+
+    DataSource: "CRC Handbook, lattice constant of Cu at 293 K"

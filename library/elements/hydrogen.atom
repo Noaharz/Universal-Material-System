@@ -1,0 +1,30 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.hydrogen"
+    Name: "Hydrogen"
+    Symbol: "H"
+    AtomicNumber: 1
+
+Properties:
+    AtomicMass: 1.008 u
+    AtomicRadius: 53 pm
+    CovalentRadius: 31 pm
+    IonizationEnergy: 13.598 eV
+    Electronegativity: 2.20
+
+Electronic:
+    ElectronConfiguration: "1s1"
+    ValenceElectrons: 1
+
+Nuclear:
+    Isotopes:
+        - MassNumber: 1
+          Abundance: 99.985%
+        - MassNumber: 2
+          Abundance: 0.015%
+
+References:
+    DataSource: "periodic_table_reference"

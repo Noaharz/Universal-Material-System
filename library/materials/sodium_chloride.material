@@ -1,0 +1,28 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.sodium_chloride"
+    Name: "Sodium Chloride"
+    Category: "Ceramic"
+
+Composition:
+    NaCl: 100%
+
+Structures:
+    - Ref: "structures/sodium_chloride.structure"
+      Role: Crystal
+
+Properties:
+    Density: 2160 kg/m^3
+    ThermalConductivity: 6.5 W/(m*K)
+    YoungsModulus: 40 GPa
+    PoissonRatio: 0.25
+    RefractiveIndex: 1.54
+    MeltingPoint: 1074 K
+
+References:
+    AtomDefinitions:
+        - "elements/sodium.atom"
+        - "elements/chlorine.atom"

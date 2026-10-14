@@ -1,0 +1,37 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.polyethylene"
+    Name: "Polyethylene"
+    Category: "Polymer"
+
+Composition:
+    C2H4: 100%
+
+Structures:
+    - Ref: "structures/polyethylene.structure"
+      Role: Polymer
+
+Properties:
+    Density: 950 kg/m^3
+    ThermalConductivity: 0.4 W/(m*K)
+    HeatCapacity: 1900 J/(kg*K)
+    YoungsModulus: 1.0 GPa
+    PoissonRatio: 0.40
+    MeltingPoint: 403 K
+
+Variants:
+    HDPE:
+        Parameters:
+            Density: 960 kg/m^3
+
+    LDPE:
+        Parameters:
+            Density: 920 kg/m^3
+
+References:
+    AtomDefinitions:
+        - "elements/carbon.atom"
+        - "elements/hydrogen.atom"

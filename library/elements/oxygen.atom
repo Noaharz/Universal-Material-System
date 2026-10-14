@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.oxygen"
+    Name: "Oxygen"
+    Symbol: "O"
+    AtomicNumber: 8
+
+Properties:
+    AtomicMass: 15.999 u
+    AtomicRadius: 60 pm
+    CovalentRadius: 66 pm
+    IonizationEnergy: 13.618 eV
+    Electronegativity: 3.44
+
+Electronic:
+    ElectronConfiguration: "[He] 2s2 2p4"
+    ValenceElectrons: 6
+
+References:
+    DataSource: "periodic_table_reference"

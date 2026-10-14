@@ -1,0 +1,17 @@
+INSTANCE
+
+Version: 1
+
+Identity:
+    Id: "instance.poolwater_mix"
+    Name: "PoolWaterMix"
+
+BaseMaterial: "materials/water.material"
+
+Components:
+    - MaterialRef: "materials/sodium_chloride.material"
+      Concentration: 0.5%
+
+State:
+    Temperature: 293 K
+    Pressure: parameterized

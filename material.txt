@@ -1,0 +1,763 @@
+Universal Material System
+Technisches Gesamtkonzept für eine modulare Material- und Strukturarchitektur
+Projektziel: Entwicklung eines universellen Materialsystems für Game Engines, CAD-Anwendungen, 3D-Modellierung, physikalische Simulationen und wissenschaftliche Anwendungen.
+Architekturprinzip: Atomdefinitionen, Strukturmodelle und Materialdefinitionen werden getrennt gespeichert. Sie können unabhängig voneinander entwickelt, wiederverwendet, geladen und aktualisiert werden.
+ 
+⸻
+ 
+1. Grundidee des Projekts
+Das Universal Material System soll reale Stoffe und ihre Eigenschaften in einer einheitlichen, erweiterbaren Architektur beschreiben.
+Das System soll sowohl einfache Materialien wie Gold als auch komplexe Materialien wie Stahl, Glas, Kunststoffe, Wasser, Beton und Verbundwerkstoffe unterstützen.
+Dabei muss zwischen drei grundlegenden Ebenen unterschieden werden:
+1. Atomdefinition: Was ist ein bestimmter Atomtyp?
+2. Strukturdefinition: Wie sind Atome oder andere Bestandteile miteinander angeordnet und verbunden?
+3. Materialdefinition: Wie ist ein Material zusammengesetzt und welche Eigenschaften und Verhaltensmodelle besitzt es?
+Diese Ebenen werden durch drei primäre Dateiformate repräsentiert:
+* .atom
+* .structure
+* .material
+Die Dateiformate sollen keine unnötigen Informationen duplizieren. Stattdessen referenzieren sie andere Ressourcen über stabile IDs und logische Ressourcenpfade.
+Zusätzlich existieren Laufzeitobjekte für konkrete Materialinstanzen, Simulationszustände und räumliche Eigenschaften.
+Grundprinzip
+Eine Materialdefinition ist kein einzelnes Objekt in der Welt. Sie ist eine wiederverwendbare Beschreibung, auf die beliebig viele Objekte und Simulationen zugreifen können.
+Beispielsweise können Millionen von Objekten dasselbe Material gold.material verwenden, ohne jeweils eine vollständige Kopie der Materialdefinition zu benötigen.
+ 
+⸻
+ 
+2. Die drei primären Dateiformate
+2.1 
+.atom
+– Atomdefinition
+Eine .atom-Datei beschreibt einen Atomtyp beziehungsweise ein chemisches Element.
+Sie definiert die grundlegenden Eigenschaften, die das System für diesen Atomtyp benötigt.
+Beispiele:
+* hydrogen.atom
+* oxygen.atom
+* carbon.atom
+* silicon.atom
+* iron.atom
+* gold.atom
+Eine .atom-Datei beschreibt ausdrücklich nicht die Position eines konkreten Atoms in einer Simulation.
+Sie beschreibt beispielsweise Gold als Element, nicht ein bestimmtes Goldatom an einer Position innerhalb eines 3D-Modells.
+Vorgesehene Inhalte
+Identity
+* Eindeutige ID
+* Elementname
+* Chemisches Symbol
+* Ordnungszahl
+* Version
+Atomic Properties
+* Atommasse
+* Atomradius
+* Kovalenter Radius
+* Ionisierungsenergie
+* Elektronegativität
+Electronic Properties
+* Elektronenkonfiguration
+* Valenzelektronen
+* Elektronische Zustandsinformationen
+Nuclear Properties
+* Isotope
+* Isotopenmassen
+* Häufigkeiten und weitere Kerndaten
+Physical Properties
+* Elementbezogene Referenzdaten
+* Weitere grundlegende physikalische Eigenschaften
+Models
+* Optionale Modelle für atomare Wechselwirkungen
+* Referenzen auf quantenmechanische oder andere wissenschaftliche Modelle
+Nicht jede Eigenschaft muss für jedes Element vorhanden sein. Optionale Daten können fehlen, ohne die grundlegende Definition ungültig zu machen.
+Beispiel: 
+gold.atom
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.gold"
+    Name: "Gold"
+    Symbol: "Au"
+    AtomicNumber: 79
+
+Properties:
+    AtomicMass: 196.96657 u
+
+Electronic:
+    ElectronConfiguration: "[Xe] 4f14 5d10 6s1"
+
+References:
+    DataSource: "periodic_table_reference"
+Dieses Beispiel ist schematisch. Die endgültige Grammatik, Datentypen und Quellenangaben werden in der technischen Spezifikation festgelegt.
+ 
+⸻
+ 
+2.2 
+.structure
+– Universelle Strukturdefinition
+Eine .structure-Datei beschreibt die Zusammensetzung, Anordnung und Verbindung von Bestandteilen.
+Sie ist bewusst nicht auf Moleküle beschränkt.
+Das System soll mit demselben Dateiformat unter anderem folgende Strukturtypen beschreiben können:
+* Moleküle
+* Kristallgitter
+* Ionische Strukturen
+* Polymere
+* Atomare Netzwerke
+* Amorphe Strukturen
+* Poröse Strukturen
+* Verbundstrukturen
+* Benutzerdefinierte Strukturen
+Ein Molekül ist damit kein eigenes Dateiformat, sondern ein möglicher StructureType.
+Vorgesehene Inhalte
+Identity
+* Struktur-ID
+* Name
+* Version
+* Strukturtyp
+Composition
+* Enthaltene Atomtypen
+* Anzahl oder Mengenverhältnisse
+* Referenzen auf andere Bestandteile
+* Optional Unterstrukturen
+Topology
+* Verbindungen zwischen Bestandteilen
+* Bindungstypen
+* Nachbarschaftsbeziehungen
+* Verknüpfungen und Abhängigkeiten
+Geometry
+* Koordinaten
+* Bindungslängen
+* Winkel
+* Lokale Koordinatensysteme
+* Geometrische Parameter
+Periodicity
+* Periodische Randbedingungen
+* Gittervektoren
+* Einheitszellen
+* Wiederholungseinheiten
+Models
+* Strukturbezogene Berechnungsmodelle
+* Optionale Interaktionsmodelle
+References
+* Atomdefinitionen
+* Unterstrukturen
+* Externe Datensätze
+* Weitere benötigte Ressourcen
+Die tatsächlichen Felder hängen vom Strukturtyp ab. Ein Molekül benötigt beispielsweise Bindungen und Molekülgeometrie, während ein Kristall andere Angaben zur Einheitszelle und Periodizität benötigt.
+Beispiel: 
+water.structure
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.water"
+    Name: "Water"
+    StructureType: Molecular
+
+Composition:
+    - AtomRef: "elements/hydrogen.atom"
+      Count: 2
+
+    - AtomRef: "elements/oxygen.atom"
+      Count: 1
+
+Topology:
+    Atoms:
+        - Id: H1
+          Type: "elements/hydrogen.atom"
+
+        - Id: O1
+          Type: "elements/oxygen.atom"
+
+        - Id: H2
+          Type: "elements/hydrogen.atom"
+
+    Bonds:
+        - From: H1
+          To: O1
+          Type: Covalent
+
+        - From: O1
+          To: H2
+          Type: Covalent
+
+Geometry:
+    BondAngle: 104.5 deg
+
+References:
+    AtomDefinitions:
+        - "elements/hydrogen.atom"
+        - "elements/oxygen.atom"
+Die Struktur referenziert dieselbe Wasserstoffdefinition zweimal. Dadurch muss keine zweite Atomsorte angelegt werden.
+Beispiel: 
+diamond.structure
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.diamond"
+    Name: "Diamond"
+    StructureType: Crystal
+
+Composition:
+    - AtomRef: "elements/carbon.atom"
+      Ratio: 1
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+
+    LatticeParameter: 3.567 angstrom
+
+Periodicity:
+    Dimensions: 3
+
+    PeriodicAxes: [true, true, true]
+Dieses Beispiel zeigt die grundsätzliche Richtung. Eine vollständige Kristalldefinition benötigt zusätzlich die genaue Basis, Koordinatenkonventionen und die erforderlichen Symmetrieinformationen.
+Grundregel
+.structure beschreibt die Struktur, nicht das gesamte Verhalten eines realen Materials.
+Strukturdaten und Materialeigenschaften werden deshalb getrennt behandelt.
+ 
+⸻
+ 
+2.3 
+.material
+– Materialdefinition
+Eine .material-Datei ist die zentrale Beschreibung eines Materials.
+Sie verbindet Zusammensetzung, Strukturen, Eigenschaften, Modelle und optionale Varianten.
+Beispiele:
+* water.material
+* gold.material
+* iron.material
+* steel.material
+* glass.material
+* diamond.material
+* concrete.material
+* polyethylene.material
+Ein Material kann eine oder mehrere Strukturdefinitionen referenzieren. Es muss aber nicht zwingend eine explizite atomare Struktur besitzen.
+Beispielsweise kann ein Material in einer Game Engine allein über seine optischen Eigenschaften definiert werden, während eine wissenschaftliche Simulation zusätzlich detaillierte Mikrostrukturdaten benötigt.
+Vorgesehene Inhalte
+Identity
+* Material-ID
+* Name
+* Kategorie
+* Version
+Composition
+* Chemische Zusammensetzung
+* Bestandteile und Mengenanteile
+* Reinheit
+* Konzentrationen
+* Zusammensetzungsprofile
+Structures
+* Referenzierte Strukturdefinitionen
+* Rolle jeder Struktur
+* Optional mehrere Strukturmodelle
+Properties
+* Dichte
+* Wärmekapazität
+* Wärmeleitfähigkeit
+* Viskosität
+* Elastizitätsmodul
+* Elektrische Leitfähigkeit
+* Optische Eigenschaften
+* Weitere materialbezogene Eigenschaften
+Models
+* Thermische Modelle
+* Mechanische Modelle
+* Optische Modelle
+* Fluidmodelle
+* Chemische Modelle
+* Phasenübergangsmodelle
+Phases
+* Fest
+* Flüssig
+* Gasförmig
+* Weitere relevante Phasen
+Variants
+* Materialvarianten
+* Parametrisierte Abwandlungen
+* Zusammensetzungsprofile
+References
+* Strukturen
+* Atomdefinitionen, soweit erforderlich
+* Datensätze
+* Berechnungsmodelle
+* Externe Ressourcen
+Die Materialdefinition soll Daten und Berechnungsmodelle miteinander verbinden können. Nicht alle Materialeigenschaften müssen als feste Zahlen gespeichert werden.
+ 
+⸻
+ 
+3. Warum 
+.molecule
+kein eigenes Dateiformat benötigt
+Moleküle sind wichtig, stellen aber nur eine mögliche Klasse von Strukturen dar.
+Würde das System für Moleküle, Kristalle, Polymere und Netzwerke jeweils ein separates Dateiformat vorsehen, entstünden unnötig viele ähnliche Formate.
+Stattdessen wird ein universelles Strukturformat verwendet:
+water.structure
+    StructureType: Molecular
+
+diamond.structure
+    StructureType: Crystal
+
+polyethylene.structure
+    StructureType: Polymer
+
+silica_glass.structure
+    StructureType: Network
+Die jeweilige Strukturklasse bestimmt, welche Felder benötigt werden.
+Dadurch können alle Strukturtypen über dieselben grundlegenden Funktionen geladen, geprüft, referenziert und versioniert werden.
+Ein gemeinsames Dateiformat bedeutet dabei nicht, dass alle Strukturtypen dieselben Datenfelder besitzen müssen.
+ 
+⸻
+ 
+4. Zusammensetzung und Varianten
+4.1 Das Problem einer riesigen Variantenbibliothek
+Eine Materialbibliothek sollte nicht für jede geringfügige Zusammensetzungsänderung eine neue Datei erzeugen.
+Ungeeignet wäre beispielsweise:
+seawater_1.material
+seawater_2.material
+seawater_3.material
+seawater_4.material
+Stattdessen soll eine Materialdefinition parametrisierbar sein.
+4.2 Materialvarianten
+Eine Variante ist eine benannte oder parametrisierte Abwandlung einer Materialdefinition.
+Beispielsweise:
+Water
+    ├── Pure
+    ├── Distilled
+    ├── TapWater
+    └── Seawater
+Varianten können direkt in .material beschrieben oder über separate Konfigurationsressourcen eingebunden werden, falls diese später erforderlich werden.
+Ein eigenes .variant-Dateiformat ist für die erste Version nicht notwendig.
+4.3 Zusammensetzungsprofile
+Ein Material kann mehrere Zusammensetzungsprofile besitzen.
+Beispiel:
+Material: Water
+
+CompositionProfiles:
+    Pure:
+        H2O: 100%
+
+    Seawater:
+        H2O: parameterized
+        DissolvedSalts: parameterized
+Die Werte sind hier schematisch. Die tatsächlichen Zusammensetzungen müssen durch passende Daten oder benutzerdefinierte Parameter festgelegt werden.
+Eine konkrete Salinität kann als Parameter einer Materialinstanz gespeichert werden, statt für jeden möglichen Wert eine neue Datei zu erzeugen.
+4.4 Mischung aus mehreren Materialien
+Eine Materialinstanz soll auch aus mehreren Materialdefinitionen zusammengesetzt werden können.
+Beispiel:
+MaterialInstance: PoolWater
+
+BaseMaterial:
+    "materials/water.material"
+
+Components:
+    - MaterialRef: "materials/sodium_chloride.material"
+      Concentration: 0.5%
+
+State:
+    Temperature: 293 K
+    Pressure: parameterized
+Die Konzentrationsangabe dient als Beispiel. In der produktiven Spezifikation muss eindeutig definiert werden, ob sie sich auf Massenanteil, Stoffmengenanteil, Volumenanteil oder eine andere Größe bezieht.
+Nicht jede Mischung lässt sich durch eine einfache lineare Kombination der Eigenschaften ihrer Bestandteile berechnen. Für solche Fälle müssen geeignete Mischungsmodelle verwendet werden.
+ 
+⸻
+ 
+5. Materialdefinition und Materialinstanz
+Diese Trennung gehört zu den wichtigsten Architekturentscheidungen.
+5.1 Materialdefinition
+Die Materialdefinition beschreibt einen wiederverwendbaren Materialtyp.
+Beispiel:
+materials/water.material
+Sie enthält allgemeine Informationen über Wasser, beispielsweise dessen Zusammensetzung, Strukturreferenzen, Eigenschaften und Berechnungsmodelle.
+5.2 Materialinstanz
+Eine Materialinstanz ist eine konkrete Verwendung einer Materialdefinition in einer Szene, einem CAD-Modell oder einer Simulation.
+Beispiel:
+MaterialInstance: PoolWater
+
+Definition:
+    "materials/water.material"
+
+State:
+    Temperature: 293 K
+    Pressure: 101325 Pa
+Eine andere Instanz kann dieselbe Definition referenzieren:
+MaterialInstance: OceanWater
+
+Definition:
+    "materials/water.material"
+
+State:
+    Temperature: 285 K
+    Pressure: parameterized
+
+Parameters:
+    Salinity: 35 PSU
+Beide Instanzen verwenden dieselbe Materialdefinition. Ihre Zustände und Parameter können sich unterscheiden.
+Eine Materialinstanz benötigt nicht zwingend eine eigene Datei. Sie kann als Laufzeitobjekt oder als Bestandteil einer Szenen-, CAD- oder Simulationsdatei existieren.
+ 
+⸻
+ 
+6. Zustände und Phasen
+Materialien können abhängig von Temperatur, Druck, Zusammensetzung und weiteren Bedingungen unterschiedliche Zustände annehmen.
+Das System muss deshalb zwischen Materialdefinition, Phase und konkretem Zustand unterscheiden.
+Beispiel:
+Material:
+    Water
+
+State:
+    Temperature: 373 K
+    Pressure: 101325 Pa
+Der Zustand allein garantiert nicht, dass sich das Material in einem bestimmten Aggregatzustand befindet. Die Phase hängt unter anderem von Druck, Temperatur und Zusammensetzung ab.
+Das System soll deshalb zwischen folgenden Konzepten unterscheiden:
+* Phase: beispielsweise fest, flüssig oder gasförmig
+* Thermodynamischer Zustand: Temperatur, Druck und weitere Zustandsgrößen
+* Materialzustand: zusätzliche Eigenschaften wie Spannung, Dehnung oder Viskositätszustand
+* Räumliche Felder: örtlich unterschiedliche Temperatur-, Druck- oder Konzentrationsverteilungen
+Zustandsdaten sollen grundsätzlich nicht als neue Materialdefinition gespeichert werden.
+Für räumlich aufgelöste Simulationen werden Felder und Zustandsdaten in geeigneten Laufzeit- oder Simulationsdatenstrukturen gespeichert.
+ 
+⸻
+ 
+7. Beispiele vollständiger Materialdefinitionen
+7.1 Wasser
+Dateien:
+elements/hydrogen.atom
+elements/oxygen.atom
+structures/water.structure
+materials/water.material
+Die Strukturdefinition beschreibt das Wassermolekül.
+Die Materialdefinition referenziert diese Struktur und enthält die für das jeweilige Einsatzgebiet benötigten Eigenschaften und Modelle.
+Mögliche Eigenschaften:
+* Dichte
+* Viskosität
+* Wärmekapazität
+* Wärmeleitfähigkeit
+* Brechungsindex
+* Phasenverhalten
+Welche Werte und Modelle benötigt werden, hängt von der Anwendung ab.
+7.2 Gold
+Dateien:
+elements/gold.atom
+structures/gold_crystal.structure
+materials/gold.material
+Das Goldmaterial kann seine atomare Zusammensetzung aus der Atomdefinition ableiten und eine Kristallstruktur referenzieren.
+Mögliche Eigenschaften:
+* Dichte
+* Wärmeleitfähigkeit
+* Elektrische Leitfähigkeit
+* Elastische Eigenschaften
+* Optische Eigenschaften
+* Reflektivität
+Ein Goldmolekül ist für die übliche Beschreibung von massivem Gold nicht erforderlich.
+7.3 Natriumchlorid
+Dateien:
+elements/sodium.atom
+elements/chlorine.atom
+structures/sodium_chloride.structure
+materials/sodium_chloride.material
+Natriumchlorid wird als ionische Struktur beziehungsweise Kristallstruktur modelliert.
+Es benötigt kein eigenes Molekülformat.
+Die Strukturdefinition beschreibt die Anordnung der Ionen und gegebenenfalls die periodische Kristallstruktur. Die Materialdefinition enthält die relevanten Eigenschaften und Berechnungsmodelle.
+7.4 Stahl
+Dateien:
+elements/iron.atom
+elements/carbon.atom
+structures/steel_microstructure.structure
+materials/steel.material
+Stahl ist ein Beispiel dafür, dass ein Material nicht immer über eine einzige einfache Struktur vollständig beschrieben werden kann.
+Abhängig von der gewünschten Genauigkeit kann die Materialdefinition mehrere Strukturen, Phasen und Zusammensetzungsprofile referenzieren.
+Ein einfaches Game-Engine-Material kann hauptsächlich optische und mechanische Parameter benötigen. Eine wissenschaftliche Simulation kann zusätzlich Mikrostruktur, Phasenanteile und komplexere Modelle erfordern.
+ 
+⸻
+ 
+8. Ressourcenreferenzen und IDs
+Dateien dürfen keine fest codierten absoluten Pfade enthalten.
+Ungeeignet:
+C:\MyEngine\Materials\Atoms\oxygen.atom
+Stattdessen werden logische Ressourcenpfade oder stabile IDs verwendet.
+Beispiele:
+elements/oxygen.atom
+
+structures/water.structure
+
+materials/water.material
+Alternativ können Ressourcen über eindeutige IDs referenziert werden:
+ResourceId: "element.oxygen"
+Der Resource Manager löst die Referenz auf die tatsächlich verfügbare Ressource auf.
+Dadurch bleibt das System portabel und funktioniert unabhängig von der konkreten Verzeichnisstruktur.
+Anforderungen
+* Plattformunabhängige Pfade
+* Eindeutige Ressourcenidentitäten
+* Versionsverwaltung
+* Referenzprüfung
+* Fehlerbehandlung bei fehlenden Ressourcen
+* Optionale Umleitung auf andere Ressourcenquellen
+* Unterstützung lokaler und entfernter Ressourcenbibliotheken
+Ressourcen-IDs und Dateipfade erfüllen unterschiedliche Aufgaben. Eine stabile ID identifiziert die Ressource, während ein Ressourcenpfad ihre Auffindbarkeit innerhalb einer Bibliothek unterstützt.
+ 
+⸻
+ 
+9. Resource Manager
+Der Resource Manager verwaltet das Laden und die Wiederverwendung von Ressourcen.
+Er soll unter anderem folgende Aufgaben übernehmen:
+1. Ressourcen anhand ihrer IDs oder logischen Pfade finden.
+2. Dateien laden und parsen.
+3. Versionen und Schemata prüfen.
+4. Referenzen auflösen.
+5. Abhängigkeiten ermitteln.
+6. Bereits geladene Ressourcen wiederverwenden.
+7. Ressourcen im Cache halten.
+8. Fehler und ungültige Referenzen melden.
+9. Optional asynchrones Laden ermöglichen.
+10. Ressourcenänderungen kontrolliert aktualisieren.
+Beispiel eines Abhängigkeitsgraphen
+water.material
+    └── water.structure
+          ├── hydrogen.atom
+          └── oxygen.atom
+Eine Ressource kann von mehreren anderen Ressourcen verwendet werden.
+Der Resource Manager muss diese gemeinsamen Abhängigkeiten erkennen, damit dieselbe Atomdefinition nicht bei jeder Referenz erneut geladen und vollständig im Speicher dupliziert wird.
+Zentrale Anforderungen
+Caching: Bereits geladene Definitionen werden wiederverwendet.
+Abhängigkeitsprüfung: Fehlende oder ungültige Referenzen werden erkannt.
+Zyklenerkennung: Unzulässige zyklische Abhängigkeiten werden verhindert oder ausdrücklich behandelt.
+Versionierung: Änderungen an Definitionen müssen kontrolliert verarbeitet werden.
+Speicherverwaltung: Ressourcen können bei Bedarf geladen, freigegeben oder erneut geladen werden.
+Thread-Sicherheit: Parallele Zugriffe dürfen keine inkonsistenten Ressourcenzustände erzeugen.
+ 
+⸻
+ 
+10. Skalierbarkeit und Speicheroptimierung
+Das System soll auch für große Projekte mit sehr vielen Materialzuweisungen geeignet sein.
+Beispiel:
+10.000.000 Material Assignments
+250 Material Definitions
+80 Atom Definitions
+Diese Zahlen dienen lediglich als Architekturbeispiel.
+Der wesentliche Punkt ist, dass die Anzahl der Materialzuweisungen nicht die Anzahl der Materialdefinitionsdateien bestimmen darf.
+Eine Materialzuweisung speichert idealerweise eine Referenz auf die Materialdefinition sowie gegebenenfalls einen Verweis auf Instanzparameter.
+Die Materialdefinition selbst wird geteilt.
+Vorgesehene Optimierungen
+* Gemeinsame Ressourcen statt duplizierter Definitionen
+* Caching geladener Ressourcen
+* Referenzen über kompakte IDs
+* Trennung statischer und dynamischer Daten
+* Lazy Loading
+* Asynchrones Laden
+* Binäre Laufzeitrepräsentationen
+* Gemeinsame Materialparameter für große Objektgruppen
+* Kompakte Speicherrepräsentation von Instanzdaten
+Die Textdateien dienen primär der Definition, Bearbeitung und Wartung. Die Engine kann daraus optimierte Laufzeitdaten erzeugen.
+ 
+⸻
+ 
+11. Trennung von Definition und Simulation
+Die Dateiformate sollen nicht sämtliche Daten einer Simulation enthalten.
+Insbesondere müssen folgende Informationen getrennt behandelt werden:
+Statische Definitionen
+* Atomdefinitionen
+* Strukturmodelle
+* Materialdefinitionen
+* Modelle und Referenzdaten
+Instanzdaten
+* Zuordnung eines Materials zu einem Objekt
+* Lokale Parameter
+* Zusammensetzung einer konkreten Mischung
+Dynamische Simulationsdaten
+* Positionen und Geschwindigkeiten
+* Temperatur- und Druckfelder
+* Spannungen und Dehnungen
+* Laufzeitänderungen der Zusammensetzung
+* Dynamische atomare Koordinaten
+Dadurch können die Definitionen unabhängig von einer konkreten Simulation wiederverwendet werden.
+Eine atomistische Simulation mit Millionen Atomen benötigt beispielsweise effiziente Arrays, räumliche Datenstrukturen und gegebenenfalls spezialisierte Binärformate. Sie soll nicht Millionen einzelner .atom- oder .structure-Dateien erzeugen.
+ 
+⸻
+ 
+12. Materialeigenschaften und Berechnungsmodelle
+Das System soll sowohl feste Eigenschaftswerte als auch berechnete Eigenschaften unterstützen.
+Eine Eigenschaft kann beispielsweise sein:
+* Ein konstanter Wert
+* Ein Wert aus einer Datentabelle
+* Eine Funktion der Temperatur
+* Eine Funktion von Temperatur und Druck
+* Eine Funktion der Zusammensetzung
+* Ein Ergebnis eines Simulationsmodells
+* Ein aus anderen Eigenschaften abgeleiteter Wert
+Beispiel:
+Properties:
+    Density:
+        Model: WaterDensity
+
+    ThermalConductivity:
+        Model: WaterThermalConductivity
+
+    RefractiveIndex:
+        Model: WaterOpticalProperties
+Die Materialdatei definiert dabei, welches Modell verwendet wird. Die Implementierung des Modells kann in einem separaten Modul oder Solver liegen.
+Wichtige Regel
+Die Definition eines Materials darf nicht automatisch eine bestimmte physikalische Genauigkeit versprechen.
+Ein vereinfachtes Modell für eine Echtzeitanwendung und ein wissenschaftliches Modell können dasselbe Material beschreiben, aber unterschiedliche Genauigkeit, Voraussetzungen und Rechenkosten besitzen.
+Modelle müssen deshalb ihre benötigten Eingaben, Gültigkeitsbereiche, Einheiten und gegebenenfalls Unsicherheiten angeben können.
+ 
+⸻
+ 
+13. Einheitensystem
+Alle physikalischen Größen müssen eindeutig definierte Einheiten besitzen.
+Beispiele:
+* Temperatur: K
+* Druck: Pa
+* Länge: m
+* Masse: kg
+* Energie: J
+* Dichte: kg/m³
+* Wärmeleitfähigkeit: W/(m·K)
+Das Format soll Einheiten explizit unterstützen oder eine eindeutig festgelegte Einheit pro Eigenschaft verwenden.
+Einheiten dürfen nicht allein aus dem Namen eines Feldes erraten werden.
+Zusätzlich muss festgelegt werden, wie das System mit dimensionslosen Größen, Prozentangaben, Konzentrationen und zusammengesetzten Einheiten umgeht.
+Für numerische Berechnungen sollen Werte in geeignete interne Einheiten konvertiert werden können.
+ 
+⸻
+ 
+14. Validierung und Fehlerbehandlung
+Alle drei Dateiformate benötigen definierte Validierungsregeln.
+.atom
+* Gültige Atom-ID
+* Gültige Elementidentität
+* Zulässige Eigenschaftswerte
+* Korrekte Einheiten
+* Eindeutige Versionsangabe
+.structure
+* Gültiger Strukturtyp
+* Auflösbare Referenzen
+* Eindeutige lokale IDs
+* Gültige Verbindungen
+* Konsistente Geometriedaten
+* Gültige Periodizität, sofern verwendet
+.material
+* Gültige Material-ID
+* Konsistente Zusammensetzung
+* Auflösbare Struktur- und Modellreferenzen
+* Gültige Eigenschaftsdefinitionen
+* Eindeutige Einheiten
+* Gültige Variantenparameter
+Fehler sollen möglichst bereits beim Import oder Laden erkannt werden, nicht erst während einer Simulation.
+Fehlende optionale Daten sind von ungültigen Pflichtdaten zu unterscheiden.
+ 
+⸻
+ 
+16. Erweiterbarkeit
+Das System soll so aufgebaut werden, dass neue Anwendungen und Strukturtypen ergänzt werden können, ohne die gesamte Architektur verändern zu müssen.
+Mögliche spätere Erweiterungen:
+* Kristallographische Werkzeuge
+* Chemische Strukturmodelle
+* Thermodynamische Modelle
+* Mechanische Materialmodelle
+* Optische Modelle
+* Fluiddynamik
+* Elektromagnetische Eigenschaften
+* Poröse Medien
+* Verbundwerkstoffe
+* Biologische Materialien
+* Spezialisierte wissenschaftliche Solver
+Neue Strukturtypen sollen über klar definierte Erweiterungen des Strukturmodells integriert werden können.
+Neue Eigenschaftsmodelle sollen unabhängig von den Dateiformaten entwickelt werden können, solange sie deren vereinbarte Schnittstellen einhalten.
+ 
+⸻
+ 
+17. Architekturregeln
+Für die Entwicklung gelten folgende Grundregeln:
+1. .atom beschreibt einen Atomtyp, nicht ein konkretes Atom in einer Simulation.
+2. .structure beschreibt eine Struktur und ist nicht auf Moleküle beschränkt.
+3. .material beschreibt ein Material und verbindet Zusammensetzung, Strukturen, Eigenschaften und Modelle.
+4. Ein eigenes .molecule-Dateiformat ist zunächst nicht erforderlich.
+5. Ein eigenes .variant-Dateiformat ist zunächst nicht erforderlich.
+6. Materialdefinitionen werden von konkreten Materialinstanzen getrennt.
+7. Zustände und räumliche Felder werden nicht als neue Materialdefinitionen gespeichert.
+8. Ressourcen werden über IDs oder logische Ressourcenpfade referenziert.
+9. Gemeinsam genutzte Definitionen werden nicht unnötig dupliziert.
+10. Die Dateiformate bleiben unabhängig von einer bestimmten Engine oder einem bestimmten Solver.
+11. Eigenschaften und Berechnungsmodelle müssen ihre Einheiten und Gültigkeitsbedingungen eindeutig definieren.
+12. Die Architektur muss einfache Echtzeitanwendungen ebenso unterstützen wie detaillierte wissenschaftliche Simulationen.
+ 
+⸻
+ 
+18. Entwicklungsplan
+Die Implementierung soll schrittweise erfolgen.
+Phase 1 – Formatspezifikation
+* Grammatik und Dateiaufbau festlegen
+* Pflichtfelder und optionale Felder definieren
+* Datentypen und Einheiten festlegen
+* IDs und Referenzen spezifizieren
+* Versionierungsregeln festlegen
+* Validierungsregeln definieren
+Ergebnis: Eine eindeutige, implementierbare Spezifikation für .atom, .structure und .material.
+Phase 2 – Parser und Validator
+* Dateien einlesen
+* Syntax prüfen
+* Schemata validieren
+* Fehler verständlich melden
+* Ressourcenreferenzen erfassen
+Ergebnis: Eine funktionierende Import- und Validierungsschicht.
+Phase 3 – Resource Manager
+* Ressourcen registrieren
+* Referenzen auflösen
+* Abhängigkeiten verwalten
+* Caching implementieren
+* Fehler bei fehlenden oder ungültigen Ressourcen behandeln
+Ergebnis: Ein zentraler Ressourcenmanager.
+Phase 4 – Materialsystem
+* Materialdefinitionen laden
+* Zusammensetzungen verarbeiten
+* Materialinstanzen erstellen
+* Parameter und Varianten unterstützen
+* Eigenschaften und Modelle referenzieren
+Ergebnis: Ein funktionierendes Materialsystem ohne Bindung an einen bestimmten Solver.
+Phase 5 – Beispielbibliothek
+* Wasser
+* Gold
+* Kohlenstoff und Diamant
+* Natriumchlorid
+* Eisen
+* Ein einfaches Polymer
+Ergebnis: Eine kleine, validierte Bibliothek, mit der die Architektur getestet werden kann.
+Phase 6 – Laufzeitintegration
+* Materialzuweisungen in einer Szene
+* Gemeinsame Materialdefinitionen
+* Speicheroptimierung
+* Laufzeitparameter
+* Optional asynchrones Laden
+Ergebnis: Integration in eine Game Engine oder CAD-Anwendung.
+Phase 7 – Wissenschaftliche Erweiterungen
+* Spezialisierte Strukturmodelle
+* Erweiterte Eigenschaftsmodelle
+* Thermische und mechanische Solver
+* Atomistische Simulationen
+* Erweiterte Phasen- und Mischungsmodelle
+Ergebnis: Eine erweiterbare Plattform für komplexere physikalische Berechnungen.
+ 
+⸻
+ 
+19. Zusammenfassung
+Das Universal Material System basiert auf drei klar getrennten Dateiformaten:
+.atom beschreibt, was ein Atomtyp ist.
+.structure beschreibt, wie Atome und andere Bestandteile strukturell angeordnet oder verbunden sind. Moleküle, Kristalle, Polymere und Netzwerke sind unterschiedliche Strukturtypen innerhalb dieses Formats.
+.material beschreibt ein Material einschließlich Zusammensetzung, relevanter Strukturen, Eigenschaften, Berechnungsmodellen und optionaler Varianten.
+Materialinstanzen und Simulationszustände werden separat behandelt.
+Ein Resource Manager verwaltet Referenzen, Abhängigkeiten, Caching und Versionen. Gemeinsame Definitionen können dadurch von sehr vielen Objekten verwendet werden, ohne dass ihre Daten mehrfach gespeichert werden müssen.
+Die Architektur soll modular, erweiterbar, plattformunabhängig und skalierbar sein.
+Das primäre Ziel ist nicht, sämtliche Physik in einem einzigen Dateiformat abzubilden. Das Ziel ist vielmehr, eine gemeinsame, stabile Datenbasis zu schaffen, auf der Game Engines, CAD-Systeme und wissenschaftliche Anwendungen unterschiedliche Materialmodelle und Berechnungsverfahren aufbauen können.
+Endgültiger Architekturvorschlag:
+.atom
+    ↓
+.structure
+    ↓
+.material
+    ↓
+Material Instance
+    ↓
+Runtime / Simulation
+Diese Darstellung ist eine konzeptionelle Übersicht, keine zwingende lineare Abhängigkeit. Materialien können mehrere Strukturen verwenden, und nicht jede Materialdefinition benötigt jede Ebene.
+Die erste konkrete Entwicklungsaufgabe ist die formale Spezifikation der drei Dateiformate. Erst wenn Grammatik, Referenzen, Einheiten, Versionierung und Validierung eindeutig definiert sind, sollte die Implementierung des Parsers und Resource Managers beginnen.

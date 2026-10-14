@@ -1,0 +1,43 @@
+STRUCTURE
+
+Version: 1
+
+Identity:
+    Id: "structure.sodium_chloride"
+    Name: "Sodium Chloride"
+    StructureType: Ionic
+
+Composition:
+    - AtomRef: "elements/sodium.atom"
+      Count: 1
+
+    - AtomRef: "elements/chlorine.atom"
+      Count: 1
+
+Topology:
+    Atoms:
+        - Id: Na1
+          Type: "elements/sodium.atom"
+
+        - Id: Cl1
+          Type: "elements/chlorine.atom"
+
+    Bonds:
+        - From: Na1
+          To: Cl1
+          Type: Ionic
+
+Crystal:
+    LatticeType: Cubic
+    BravaisLattice: FCC
+    SpaceGroup: "Fm-3m"
+    LatticeParameter: 5.64 angstrom
+
+Periodicity:
+    Dimensions: 3
+    PeriodicAxes: [true, true, true]
+
+References:
+    AtomDefinitions:
+        - "elements/sodium.atom"
+        - "elements/chlorine.atom"

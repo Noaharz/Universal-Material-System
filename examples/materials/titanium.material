@@ -1,0 +1,29 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.titanium"
+    Name: "Titanium"
+    Category: "Metal"
+
+Composition:
+    Ti: 100%
+
+Structures:
+    - Ref: "structures/titanium_crystal.structure"
+      Role: Crystal
+
+Properties:
+    Density: 4507 kg/m^3
+    ThermalConductivity: 21.9 W/(m*K)
+    ElectricalConductivity: 2.38e6 S/m
+    HeatCapacity: 523 J/(kg*K)
+    YoungsModulus: 116 GPa
+    PoissonRatio: 0.32
+    MeltingPoint: 1941 K
+
+References:
+    DataSource: "ASM Handbook, wrought commercially pure titanium"
+    AtomDefinitions:
+        - "elements/titanium.atom"

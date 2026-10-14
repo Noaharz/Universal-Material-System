@@ -1,0 +1,28 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.diamond"
+    Name: "Diamond"
+    Category: "Mineral"
+
+Composition:
+    C: 100%
+
+Structures:
+    - Ref: "structures/diamond.structure"
+      Role: Crystal
+
+Properties:
+    Density: 3510 kg/m^3
+    ThermalConductivity: 2200 W/(m*K)
+    HeatCapacity: 509 J/(kg*K)
+    YoungsModulus: 1050 GPa
+    PoissonRatio: 0.10
+    RefractiveIndex: 2.42
+    MeltingPoint: 3820 K
+
+References:
+    AtomDefinitions:
+        - "elements/carbon.atom"

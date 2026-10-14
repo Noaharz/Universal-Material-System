@@ -1,0 +1,42 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.steel"
+    Name: "Steel"
+    Category: "Alloy"
+
+Composition:
+    Fe: 99.2%
+    C: 0.8%
+
+Structures:
+    - Ref: "structures/steel_microstructure.structure"
+      Role: Microstructure
+
+    - Ref: "structures/iron_crystal.structure"
+      Role: Matrix
+
+Properties:
+    Density: 7850 kg/m^3
+    ThermalConductivity: 45 W/(m*K)
+    ElectricalConductivity: 6.99e6 S/m
+    YoungsModulus: 210 GPa
+    PoissonRatio: 0.29
+    MeltingPoint: 1700 K
+
+Variants:
+    CarbonSteel:
+        Parameters:
+            CarbonContent: 0.8%
+
+    StainlessSteel:
+        Parameters:
+            ChromiumContent: 18%
+            NickelContent: 8%
+
+References:
+    AtomDefinitions:
+        - "elements/iron.atom"
+        - "elements/carbon.atom"
