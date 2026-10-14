@@ -44,6 +44,21 @@ void push_unique(std::vector<std::string>& refs, const std::string& ref) {
     if (std::find(refs.begin(), refs.end(), ref) == refs.end()) refs.push_back(ref);
 }
 
+Value collect_extra(const Value& sections, const std::vector<std::string>& known) {
+    Value extra = Value::map();
+    if (!sections.is_map()) return extra;
+    for (const auto& entry : sections.fields()) {
+        if (std::find(known.begin(), known.end(), entry.first) != known.end()) continue;
+        extra.set_field(entry.first, entry.second);
+    }
+    return extra;
+}
+
+Value optional_section(const Value& sections, const std::string& key) {
+    const Value* value = section(sections, key);
+    return value != nullptr ? *value : Value::null();
+}
+
 std::string canonical_structure_type(const std::string& raw) {
     static const char* types[] = {"Molecular", "Crystal", "Ionic", "Polymer",
                                   "Network",   "Amorphous", "Porous", "Composite"};
@@ -152,6 +167,8 @@ AtomDefinition read_atom(const Document& document) {
     atom.physical = as_map(section(sections, "Physical"));
     atom.models = as_map(section(sections, "Models"));
     atom.references = as_map(section(sections, "References"));
+    atom.extra = collect_extra(sections, {"Version", "Identity", "Properties", "Electronic", "Nuclear", "Physical",
+                                          "Models", "References"});
     atom.source_path = document.path;
     return atom;
 }
@@ -178,6 +195,8 @@ StructureDefinition read_structure(const Document& document) {
     structure.models = as_map(section(sections, "Models"));
     structure.references = as_map(section(sections, "References"));
     structure.substructures = as_list(section(sections, "Substructures"));
+    structure.extra = collect_extra(sections, {"Version", "Identity", "Composition", "Topology", "Geometry",
+                                               "Crystal", "Periodicity", "Models", "References", "Substructures"});
     structure.source_path = document.path;
     return structure;
 }
@@ -198,6 +217,12 @@ MaterialDefinition read_material(const Document& document) {
     material.variants = as_map(section(sections, "Variants"));
     material.composition_profiles = as_map(section(sections, "CompositionProfiles"));
     material.references = as_map(section(sections, "References"));
+    material.appearance = optional_section(sections, "Appearance");
+    material.contact = optional_section(sections, "Contact");
+    material.contact_pairs = optional_section(sections, "ContactPairs");
+    material.extra = collect_extra(
+        sections, {"Version", "Identity", "Composition", "Structures", "Properties", "Models", "Phases", "Variants",
+                   "CompositionProfiles", "References", "Appearance", "Contact", "ContactPairs"});
     material.source_path = document.path;
     return material;
 }
@@ -242,6 +267,11 @@ MaterialInstance read_instance(const Document& document) {
 
     instance.state = as_map(section(sections, "State"));
     instance.parameters = as_map(section(sections, "Parameters"));
+    instance.appearance = optional_section(sections, "Appearance");
+    instance.contact = optional_section(sections, "Contact");
+    instance.extra = collect_extra(
+        sections, {"Version", "Identity", "Id", "Name", "Definition", "BaseMaterial", "Material", "Variant",
+                   "Components", "State", "Parameters", "Appearance", "Contact"});
     instance.source_path = document.path;
     return instance;
 }

@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.nickel"
+    Name: "Nickel"
+    Symbol: "Ni"
+    AtomicNumber: 28
+
+Properties:
+    AtomicMass: 58.6934 u
+    AtomicRadius: 124 pm
+    CovalentRadius: 124 pm
+    IonizationEnergy: 7.640 eV
+    Electronegativity: 1.91
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d8 4s2"
+    ValenceElectrons: 2
+
+References:
+    DataSource: "periodic_table_reference"

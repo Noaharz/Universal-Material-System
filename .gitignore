@@ -43,6 +43,7 @@ Thumbs.db
 desktop.ini
 
 # C / C++ build artifacts
+build-*/
 *.o
 *.obj
 *.a

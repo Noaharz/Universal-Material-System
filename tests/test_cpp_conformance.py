@@ -82,6 +82,20 @@ INVALID_DOCUMENTS = {
     "atom_absolute_ref": (
         "ATOM\n\nIdentity:\n    Id: \"element.x\"\n    Name: \"X\"\n\nReferences:\n    DataSource: \"/etc/data\"\n"
     ),
+    "material_appearance_invalid": (
+        "MATERIAL\n\nIdentity:\n    Id: \"material.x\"\n    Name: \"X\"\n\n"
+        "Appearance:\n    BaseColor: [1, 2]\n    Metallic: 5\n    AlphaMode: Glow\n"
+        "    Textures:\n        Normal:\n            UVScale: [1]\n"
+    ),
+    "material_contact_invalid": (
+        "MATERIAL\n\nIdentity:\n    Id: \"material.y\"\n    Name: \"Y\"\n\n"
+        "Contact:\n    FrictionCombine: Sometimes\n    Restitution: 2\n\n"
+        "ContactPairs:\n    - StaticFriction: -1\n"
+    ),
+    "material_variant_appearance_invalid": (
+        "MATERIAL\n\nIdentity:\n    Id: \"material.z\"\n    Name: \"Z\"\n\n"
+        "Variants:\n    Hot:\n        Appearance:\n            Roughness: 5\n"
+    ),
 }
 
 

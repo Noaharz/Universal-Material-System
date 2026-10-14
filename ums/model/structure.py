@@ -36,6 +36,20 @@ class StructureType(enum.Enum):
         return cls.CUSTOM
 
 
+KNOWN_SECTIONS = {
+    "Version",
+    "Identity",
+    "Composition",
+    "Topology",
+    "Geometry",
+    "Crystal",
+    "Periodicity",
+    "Models",
+    "References",
+    "Substructures",
+}
+
+
 @dataclass
 class StructureDefinition:
     identity: Identity
@@ -48,6 +62,7 @@ class StructureDefinition:
     models: Dict[str, Any] = field(default_factory=dict)
     references: Dict[str, Any] = field(default_factory=dict)
     substructures: List[Any] = field(default_factory=list)
+    extra: Dict[str, Any] = field(default_factory=dict)
     source_path: Optional[str] = None
 
     @property
@@ -115,6 +130,7 @@ class StructureDefinition:
             models=dict(sections.get("Models") or {}),
             references=dict(sections.get("References") or {}),
             substructures=list(sections.get("Substructures") or []),
+            extra={k: v for k, v in sections.items() if k not in KNOWN_SECTIONS},
             source_path=source_path,
         )
 
@@ -143,6 +159,8 @@ class StructureDefinition:
             sections["References"] = self.references
         if self.substructures:
             sections["Substructures"] = self.substructures
+        for key, value in self.extra.items():
+            sections[key] = value
         return sections
 
     def to_dict(self) -> Dict[str, Any]:
@@ -159,6 +177,7 @@ class StructureDefinition:
             "periodicity": self.periodicity,
             "models": self.models,
             "references": self.references,
+            "extra": self.extra,
             "source_path": self.source_path,
         }
 

@@ -5,6 +5,7 @@
 #include "ums/errors.hpp"
 #include "ums/library.hpp"
 #include "ums/reader.hpp"
+#include "ums/writer.hpp"
 
 namespace {
 
@@ -86,6 +87,34 @@ State:
     Temperature: 293 K
 )";
 
+const char* kAppearance = R"(MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.skin"
+    Name: "Skin"
+
+Appearance:
+    BaseColor: [0.8, 0.6, 0.5, 1.0]
+    Roughness: 0.4
+    AlphaMode: Opaque
+    Textures:
+        Normal:
+            Ref: "textures/skin_normal.png"
+
+Contact:
+    StaticFriction: 0.8
+    Restitution: 0.0
+
+ContactPairs:
+    - Other: "material.cloth"
+      StaticFriction: 0.6
+
+ExtraSection:
+    Foo: "bar"
+)";
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -132,6 +161,31 @@ int main(int argc, char** argv) {
     check(instance.components.size() == 1, "instance component count");
     check(instance.components.size() == 1 && instance.components[0].material_ref == "materials/sodium_chloride.material",
           "instance component ref");
+
+    Document appearance_document = parse_document(kAppearance);
+    MaterialDefinition skin = read_material(appearance_document);
+    check(skin.appearance.is_map(), "material appearance captured");
+    check(skin.contact.is_map(), "material contact captured");
+    check(skin.contact_pairs.is_list() && skin.contact_pairs.items().size() == 1, "material contact pairs captured");
+    check(skin.extra.is_map() && skin.extra.field("ExtraSection") != nullptr, "unknown section preserved");
+
+    DocumentWriter writer(DocumentType::Material);
+    writer.set_identity("material.written", "Written");
+    Value appearance = Value::map();
+    appearance.set_field("Roughness", Value::number(0.25));
+    writer.set_appearance(appearance);
+    std::string written = writer.text();
+    Document reparsed = parse_document(written);
+    MaterialDefinition written_material = read_material(reparsed);
+    check(written_material.identity.id == "material.written", "writer identity round-trip");
+    check(written_material.appearance.is_map() && written_material.appearance.field("Roughness") != nullptr,
+          "writer appearance round-trip");
+
+    DocumentResult ok_result = try_parse_document(kMaterial);
+    check(ok_result.has_value(), "try_parse_document success");
+    DocumentResult bad_result = try_parse_document("ATOM\n  bad\n");
+    check(!bad_result.has_value(), "try_parse_document failure");
+    check(!bad_result.has_value() && bad_result.error().line == 2, "try_parse_document error line");
 
     bool syntax_error = false;
     try {

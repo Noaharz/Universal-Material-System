@@ -21,6 +21,7 @@ void print_usage() {
                  "commands:\n"
                  "  canonical   parse then serialize a document deterministically\n"
                  "  parse       parse a document and report success or an error\n"
+                 "  try-parse   non-throwing parse; prints OK or a diagnostic\n"
                  "  validate    run the validation rules and print the report\n"
                  "  resolve     report whether a reference can be resolved\n"
                  "  unit        parse a unit expression and print its dimension\n"
@@ -97,6 +98,18 @@ int main(int argc, char** argv) {
     Document document;
     bool have_document = false;
     try {
+        if (command == "try-parse") {
+            std::string text = read_file(target);
+            DocumentResult result = try_parse_buffer(text.data(), text.size(), target);
+            if (result.has_value()) {
+                std::cout << "OK\t" << to_string(result->type) << "\n";
+                return 0;
+            }
+            const Diagnostic& diagnostic = result.error();
+            std::cout << "DIAG\t" << diagnostic.code << "\t" << diagnostic.line << "\t" << diagnostic.column << "\t"
+                      << diagnostic.path << "\n";
+            return 1;
+        }
         if (!libraries.empty()) {
             ResourceLibrary library(libraries);
             library.index();

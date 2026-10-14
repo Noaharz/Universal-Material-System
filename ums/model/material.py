@@ -12,7 +12,25 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from ..units import Quantity
+from .appearance import Appearance
 from .base import Identity, as_str, identity_from_sections, quantity_map
+from .contact import Contact, ContactPair, contact_pairs_from_sections, contact_pairs_to_sections
+
+KNOWN_SECTIONS = {
+    "Version",
+    "Identity",
+    "Composition",
+    "Structures",
+    "Properties",
+    "Models",
+    "Phases",
+    "Variants",
+    "CompositionProfiles",
+    "References",
+    "Appearance",
+    "Contact",
+    "ContactPairs",
+}
 
 
 @dataclass
@@ -34,9 +52,17 @@ class Variant:
     name: str
     parameters: Dict[str, Any] = field(default_factory=dict)
     overrides: Dict[str, Any] = field(default_factory=dict)
+    appearance: Optional[Dict[str, Any]] = None
+    contact: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"name": self.name, "parameters": self.parameters, "overrides": self.overrides}
+        return {
+            "name": self.name,
+            "parameters": self.parameters,
+            "overrides": self.overrides,
+            "appearance": self.appearance,
+            "contact": self.contact,
+        }
 
 
 @dataclass
@@ -50,6 +76,10 @@ class MaterialDefinition:
     variants: Dict[str, Variant] = field(default_factory=dict)
     composition_profiles: Dict[str, CompositionProfile] = field(default_factory=dict)
     references: Dict[str, Any] = field(default_factory=dict)
+    appearance: Optional[Appearance] = None
+    contact: Optional[Contact] = None
+    contact_pairs: List[ContactPair] = field(default_factory=list)
+    extra: Dict[str, Any] = field(default_factory=dict)
     source_path: Optional[str] = None
 
     @property
@@ -143,6 +173,8 @@ class MaterialDefinition:
                         name=name,
                         parameters=quantity_map(value.get("Parameters") or {}),
                         overrides=quantity_map(value.get("Overrides") or {}),
+                        appearance=value.get("Appearance") if isinstance(value.get("Appearance"), dict) else None,
+                        contact=value.get("Contact") if isinstance(value.get("Contact"), dict) else None,
                     )
                 else:
                     variants[name] = Variant(name=name, parameters=quantity_map({"Value": value}))
@@ -152,6 +184,12 @@ class MaterialDefinition:
         if isinstance(phases_raw, dict):
             for phase_name, spec in phases_raw.items():
                 phases[phase_name] = quantity_map(spec) if isinstance(spec, dict) else spec
+
+        appearance = Appearance.from_sections(sections.get("Appearance")) if "Appearance" in sections else None
+        contact = Contact.from_sections(sections.get("Contact")) if "Contact" in sections else None
+        contact_pairs = contact_pairs_from_sections(sections.get("ContactPairs"))
+
+        extra = {k: v for k, v in sections.items() if k not in KNOWN_SECTIONS}
 
         return cls(
             identity=identity,
@@ -163,6 +201,10 @@ class MaterialDefinition:
             variants=variants,
             composition_profiles=composition_profiles,
             references=dict(sections.get("References") or {}),
+            appearance=appearance,
+            contact=contact,
+            contact_pairs=contact_pairs,
+            extra=extra,
             source_path=source_path,
         )
 
@@ -179,6 +221,12 @@ class MaterialDefinition:
             sections["Structures"] = self.structures
         if self.properties:
             sections["Properties"] = {k: scalar_to_primitive(v) for k, v in self.properties.items()}
+        if self.appearance is not None and self.appearance.present:
+            sections["Appearance"] = self.appearance.to_sections()
+        if self.contact is not None and self.contact.present:
+            sections["Contact"] = self.contact.to_sections()
+        if self.contact_pairs:
+            sections["ContactPairs"] = contact_pairs_to_sections(self.contact_pairs)
         if self.models:
             sections["Models"] = self.models
         if self.phases:
@@ -193,11 +241,15 @@ class MaterialDefinition:
                 name: {
                     "Parameters": {k: scalar_to_primitive(v) for k, v in variant.parameters.items()},
                     **({"Overrides": variant.overrides} if variant.overrides else {}),
+                    **({"Appearance": variant.appearance} if variant.appearance else {}),
+                    **({"Contact": variant.contact} if variant.contact else {}),
                 }
                 for name, variant in self.variants.items()
             }
         if self.references:
             sections["References"] = self.references
+        for key, value in self.extra.items():
+            sections[key] = value
         return sections
 
     def to_dict(self) -> Dict[str, Any]:
@@ -215,6 +267,10 @@ class MaterialDefinition:
             "variants": {k: v.to_dict() for k, v in self.variants.items()},
             "composition_profiles": {k: v.to_dict() for k, v in self.composition_profiles.items()},
             "references": self.references,
+            "appearance": self.appearance.to_dict() if self.appearance else None,
+            "contact": self.contact.to_dict() if self.contact else None,
+            "contact_pairs": [p.to_sections() for p in self.contact_pairs],
+            "extra": self.extra,
             "source_path": self.source_path,
         }
 

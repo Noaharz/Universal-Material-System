@@ -67,3 +67,27 @@ not duplicated in memory.
 * **Versioning** — changes to definitions are handled in a controlled way.
 * **Memory management** — resources can be loaded, released and reloaded.
 * **Thread safety** — concurrent access cannot corrupt resource state.
+
+## 7. Host-resolved (opaque) references
+
+Not every reference points at a UMS definition. A texture `Ref` in the
+`Appearance` block may be an engine asset id that UMS cannot know - for example
+a UUID. UMS treats such values as **opaque strings**: it stores and validates
+their shape but never guesses their meaning.
+
+The host decides how they resolve:
+
+* Provide an `asset_checker` to `Validator` / `ResourceRegistry` to check them.
+  An unresolved opaque reference is then an error.
+* Without a checker, the reference falls back to the UMS `reference_checker`
+  (logical path against the library) and finally to an informational note.
+
+The same mechanism backs `ContactPairs[*].Other`, so engines can point contact
+overrides at their own material ids without UMS parsing a foreign format.
+
+## 8. C++ host integration
+
+The C++ reader mirrors this: `ResourceRegistry::set_resolver` and
+`Validator(reference_checker, asset_checker)` accept host callbacks, and the
+non-throwing `try_parse_document` / `try_parse_buffer` API returns a
+`Diagnostic` instead of throwing. See `cpp/include/ums/result.hpp`.

@@ -14,8 +14,11 @@ from typing import Any, Dict, List, Optional
 from .errors import UmsError
 from .models import get_model_factory
 from .model import (
+    Appearance,
     AtomDefinition,
     CompositionProfile,
+    Contact,
+    ContactPair,
     MaterialDefinition,
     MaterialInstance,
     StructureDefinition,
@@ -67,6 +70,34 @@ class ResolvedMaterial:
         if self.variant:
             return self.definition.variant(self.variant)
         return None
+
+    def appearance(self) -> Appearance:
+        """Merge Appearance from definition, variant and instance.
+
+        Later sources override earlier ones field by field; textures are merged
+        per slot. The result always has defaults available through ``get``.
+        """
+        result = self.definition.appearance or Appearance()
+        variant = self.variant_object()
+        if variant is not None and variant.appearance:
+            result = result.merge(variant.appearance)
+        if self.instance is not None and self.instance.appearance:
+            result = result.merge(self.instance.appearance)
+        return result
+
+    def contact(self) -> Contact:
+        """Merge Contact from definition, variant and instance."""
+        result = self.definition.contact or Contact()
+        variant = self.variant_object()
+        if variant is not None and variant.contact:
+            result = result.merge(variant.contact)
+        if self.instance is not None and self.instance.contact:
+            result = result.merge(self.instance.contact)
+        return result
+
+    def contact_pairs(self) -> List[ContactPair]:
+        """Contact pair overrides declared on the definition."""
+        return list(self.definition.contact_pairs)
 
     def resolve_property(self, name: str) -> Optional[Quantity]:
         """Resolve a property to a quantity, evaluating a model when referenced."""

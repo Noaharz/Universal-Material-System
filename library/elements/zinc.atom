@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.zinc"
+    Name: "Zinc"
+    Symbol: "Zn"
+    AtomicNumber: 30
+
+Properties:
+    AtomicMass: 65.38 u
+    AtomicRadius: 139 pm
+    CovalentRadius: 122 pm
+    IonizationEnergy: 9.394 eV
+    Electronegativity: 1.65
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d10 4s2"
+    ValenceElectrons: 2
+
+References:
+    DataSource: "periodic_table_reference"

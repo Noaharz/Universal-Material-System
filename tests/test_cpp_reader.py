@@ -82,7 +82,7 @@ def test_instance_reader(umsdump):
 def test_library_index_and_lookup(umsdump):
     result = _run(umsdump, "--lib", str(ROOT / "library"), "--list")
     assert result.returncode == 0, result.stderr
-    assert "resources: 27" in result.stdout
+    assert "resources: 42" in result.stdout
     assert "[element.gold]" in result.stdout
 
     by_id = _run(umsdump, "--lib", str(ROOT / "library"), "material.steel")

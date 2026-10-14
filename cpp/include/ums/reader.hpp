@@ -31,6 +31,7 @@ struct AtomDefinition {
     Value physical;
     Value models;
     Value references;
+    Value extra;
     std::string source_path;
 
     std::optional<Quantity> property(const std::string& name) const;
@@ -47,6 +48,7 @@ struct StructureDefinition {
     Value models;
     Value references;
     Value substructures;
+    Value extra;
     std::string source_path;
 
     std::vector<std::string> atom_refs() const;
@@ -62,6 +64,10 @@ struct MaterialDefinition {
     Value variants;
     Value composition_profiles;
     Value references;
+    Value appearance;
+    Value contact;
+    Value contact_pairs;
+    Value extra;
     std::string source_path;
 
     std::vector<std::string> structure_refs() const;
@@ -82,6 +88,9 @@ struct MaterialInstance {
     Value state;
     Value parameters;
     std::vector<MixComponent> components;
+    Value appearance;
+    Value contact;
+    Value extra;
     std::string source_path;
 };
 

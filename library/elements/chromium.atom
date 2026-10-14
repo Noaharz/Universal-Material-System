@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.chromium"
+    Name: "Chromium"
+    Symbol: "Cr"
+    AtomicNumber: 24
+
+Properties:
+    AtomicMass: 51.9961 u
+    AtomicRadius: 128 pm
+    CovalentRadius: 139 pm
+    IonizationEnergy: 6.767 eV
+    Electronegativity: 1.66
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d5 4s1"
+    ValenceElectrons: 1
+
+References:
+    DataSource: "periodic_table_reference"

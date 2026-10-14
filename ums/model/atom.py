@@ -10,6 +10,18 @@ from ..units import Quantity
 from .base import Identity, as_int, identity_from_sections, quantity_map
 
 
+KNOWN_SECTIONS = {
+    "Version",
+    "Identity",
+    "Properties",
+    "Electronic",
+    "Nuclear",
+    "Physical",
+    "Models",
+    "References",
+}
+
+
 @dataclass
 class AtomDefinition:
     """Describes an atomic type (element), not a concrete atom in a scene."""
@@ -23,6 +35,7 @@ class AtomDefinition:
     physical: Dict[str, Any] = field(default_factory=dict)
     models: Dict[str, Any] = field(default_factory=dict)
     references: Dict[str, Any] = field(default_factory=dict)
+    extra: Dict[str, Any] = field(default_factory=dict)
     source_path: Optional[str] = None
 
     @property
@@ -63,6 +76,7 @@ class AtomDefinition:
             physical=dict(sections.get("Physical") or {}),
             models=dict(sections.get("Models") or {}),
             references=dict(sections.get("References") or {}),
+            extra={k: v for k, v in sections.items() if k not in KNOWN_SECTIONS},
             source_path=source_path,
         )
 
@@ -85,6 +99,8 @@ class AtomDefinition:
         ):
             if block:
                 sections[name] = {k: scalar_to_primitive(v) for k, v in block.items()}
+        for key, value in self.extra.items():
+            sections[key] = value
         return sections
 
     def to_dict(self) -> Dict[str, Any]:
@@ -101,6 +117,7 @@ class AtomDefinition:
             "physical": self.physical,
             "models": self.models,
             "references": self.references,
+            "extra": self.extra,
             "source_path": self.source_path,
         }
 

@@ -5,7 +5,7 @@ from ums.resources import ResourceManager
 
 
 def test_index_and_lookup(manager):
-    assert len(manager) == 27
+    assert len(manager) == 42
     assert manager.has("elements/gold.atom")
     assert manager.has("element.gold")
     assert manager.get("element.gold").symbol == "Au"

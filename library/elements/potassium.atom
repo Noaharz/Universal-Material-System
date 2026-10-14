@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.potassium"
+    Name: "Potassium"
+    Symbol: "K"
+    AtomicNumber: 19
+
+Properties:
+    AtomicMass: 39.0983 u
+    AtomicRadius: 220 pm
+    CovalentRadius: 203 pm
+    IonizationEnergy: 4.341 eV
+    Electronegativity: 0.82
+
+Electronic:
+    ElectronConfiguration: "[Ar] 4s1"
+    ValenceElectrons: 1
+
+References:
+    DataSource: "periodic_table_reference"

@@ -30,6 +30,10 @@ from .model import (
     MaterialInstance,
     CompositionProfile,
     Variant,
+    Appearance,
+    Texture,
+    Contact,
+    ContactPair,
 )
 from .validation import Validator, ValidationReport, Issue
 from .resources import ResourceManager, ResourceReference
@@ -62,6 +66,10 @@ __all__ = [
     "MaterialInstance",
     "CompositionProfile",
     "Variant",
+    "Appearance",
+    "Texture",
+    "Contact",
+    "ContactPair",
     "Validator",
     "ValidationReport",
     "Issue",

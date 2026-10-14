@@ -22,10 +22,17 @@ paths, and are shared by any number of objects and simulations.
 | --- | --- | --- |
 | `.atom` | Atom type / chemical element | `library/elements/gold.atom` |
 | `.structure` | Universal structure (molecule, crystal, ionic, polymer, network, amorphous, porous, composite, custom) | `library/structures/water.structure` |
-| `.material` | Material composition, structures, properties, models, phases, variants | `library/materials/water.material` |
+| `.material` | Material composition, structures, properties, models, phases, variants, render `Appearance`, physics `Contact` | `library/materials/water.material` |
 
 A molecule is not its own file format — it is a `StructureType: Molecular`
 inside `.structure`. There is likewise no separate `.variant` format.
+
+A `.material` may also carry two optional, host-facing blocks: an `Appearance`
+block (PBR metallic-roughness, glTF 2.0 semantics) and a `Contact` /
+`ContactPairs` block (surface friction and restitution). Both are additive and
+backwards compatible with `Version: 1`; unknown fields and sections are
+preserved on load and written back on save. See `specification/material-format.md`
+for details.
 
 Example — `library/elements/gold.atom`:
 
@@ -93,15 +100,16 @@ universal-material-system/
 │   └── cli.py                  # `ums-cli`
 ├── cpp/                        # standalone C++20 reader (no dependencies, WASM-ready)
 │   ├── include/ums/            # value, errors, units, parser, serializer, validation,
-│   │                           #   reader, registry, library, fileio
+│   │                           #   reader, result, writer, registry, library, fileio
 │   ├── src/                    # core (fs-free) + fileio/library (filesystem)
 │   ├── tools/umsdump.cpp       # inspection CLI
-│   ├── tools/umsconf.cpp       # conformance CLI (parse/canonical/validate/resolve/units)
-│   └── tests/                  # core_test + reader_test (CTest suite)
+│   ├── tools/umsconf.cpp       # conformance CLI (parse/try-parse/canonical/validate/resolve/units)
+│   ├── tests/                  # core_test + reader_test (CTest suite)
+│   └── BUILD.bazel             # Bazel targets (MODULE.bazel at repo root)
 ├── library/                    # Phase 5 example library
-│   ├── elements/               # 10 atoms
+│   ├── elements/               # 24 atoms
 │   ├── structures/             # 8 structures
-│   └── materials/              # 9 materials
+│   └── materials/              # 10 materials (incl. material.default)
 ├── examples/                   # elements, structures, materials, instances, scenes
 ├── specification/             # formal format specification (Phase 1)
 └── tests/                      # pytest suite (incl. C++ reader integration)
@@ -216,7 +224,11 @@ Key pieces:
 - `registry.hpp` — fs-free `ResourceRegistry` (IDs, logical paths, dependency graph,
   cycles, missing references); resolves refs by path **or** stable ID.
 - `reader.hpp` — typed `AtomDefinition`, `StructureDefinition`, `MaterialDefinition`,
-  `MaterialInstance`.
+  `MaterialInstance` (including `Appearance`, `Contact`, `ContactPairs` and preserved
+  unknown sections).
+- `result.hpp` — `Diagnostic` / `Result<T>`; the non-throwing `try_parse_document` /
+  `try_parse_buffer` API reports the error line/column instead of throwing.
+- `writer.hpp` — `DocumentWriter` for building and round-tripping documents in C++.
 - `library.hpp`, `fileio.hpp` — filesystem layer (search paths, indexing, `parse_file`).
 
 The entire core is I/O-free and therefore WASM-ready: build with
@@ -235,8 +247,16 @@ cpp/build/umsdump --lib examples --tree structures/titanium_crystal.structure
 
 cpp/build/umsconf canonical library/elements/gold.atom       # deterministic re-serialization
 cpp/build/umsconf validate library/materials/gold.material   # same rules as Python
+cpp/build/umsconf try-parse library/materials/default.material # non-throwing Result API
 cpp/build/umsconf resolve element.gold --lib library         # reference resolution
 cpp/build/umsconf unit "W/(m*K)"                             # unit parsing
+```
+
+Bazel (bzlmod) targets are provided as an alternative to CMake:
+
+```bash
+bazel build //cpp:umsdump //cpp:umsconf
+bazel test //cpp:core_test //cpp:reader_test
 ```
 
 ```cpp
@@ -276,6 +296,6 @@ identical parse results, canonical serialization, validation issues
 ## 7. Tests
 
 ```bash
-python -m pytest          # Python suite + C++ reader/conformance integration (102 tests)
+python -m pytest          # Python suite + C++ reader/conformance integration (126 tests)
 ctest --test-dir cpp/build
 ```

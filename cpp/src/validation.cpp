@@ -134,6 +134,39 @@ std::string string_field(const Value& map, const std::string& key) {
     return value != nullptr && value->is_string() ? value->string_value : std::string();
 }
 
+const std::vector<std::string>& appearance_fields() {
+    static const std::vector<std::string> fields = {
+        "BaseColor",     "Metallic",        "Roughness", "EmissionColor", "EmissionStrength", "Opacity",
+        "AlphaMode",     "AlphaCutoff",     "DoubleSided", "NormalScale",  "OcclusionStrength"};
+    return fields;
+}
+
+const std::vector<std::string>& texture_slots() {
+    static const std::vector<std::string> slots = {"BaseColor", "MetallicRoughness", "Normal", "Occlusion",
+                                                   "Emission"};
+    return slots;
+}
+
+const std::vector<std::string>& alpha_modes() {
+    static const std::vector<std::string> modes = {"Opaque", "Mask", "Blend"};
+    return modes;
+}
+
+const std::vector<std::string>& contact_fields() {
+    static const std::vector<std::string> fields = {"StaticFriction", "DynamicFriction", "Restitution",
+                                                    "FrictionCombine", "RestitutionCombine"};
+    return fields;
+}
+
+const std::vector<std::string>& combine_modes() {
+    static const std::vector<std::string> modes = {"Average", "Minimum", "Multiply", "Maximum", "GeometricMean"};
+    return modes;
+}
+
+bool in_list(const std::vector<std::string>& values, const std::string& value) {
+    return std::find(values.begin(), values.end(), value) != values.end();
+}
+
 }  // namespace
 
 std::string to_string(Severity severity) {
@@ -160,7 +193,8 @@ void ValidationReport::add(const std::string& code, const std::string& message, 
     issues.push_back(Issue{code, message, severity, path});
 }
 
-Validator::Validator(ReferenceChecker reference_checker) : reference_checker_(std::move(reference_checker)) {}
+Validator::Validator(ReferenceChecker reference_checker, AssetChecker asset_checker)
+    : reference_checker_(std::move(reference_checker)), asset_checker_(std::move(asset_checker)) {}
 
 void Validator::check_reference(ValidationReport& report, const std::string& ref, const std::string& path) const {
     if (ref.empty()) {
@@ -369,6 +403,182 @@ ValidationReport Validator::validate_structure(const Document& document) const {
     return report;
 }
 
+void Validator::validate_number(ValidationReport& report, const Value& value, const std::string& path, bool has_lower,
+                                double lower, bool has_upper, double upper, const std::string& code) const {
+    if (!value.is_number()) {
+        report.add(code + "_VALUE", path + " must be a number", Severity::Error, path);
+        return;
+    }
+    double number = value.as_double();
+    if (has_lower && number < lower) {
+        report.add(code + "_RANGE", path + " must be >= " + std::to_string(lower), Severity::Error, path);
+        return;
+    }
+    if (has_upper && number > upper) {
+        report.add(code + "_RANGE", path + " must be <= " + std::to_string(upper), Severity::Error, path);
+    }
+}
+
+void Validator::validate_color(ValidationReport& report, const Value& value, const std::string& path,
+                               bool allow_alpha) const {
+    bool size_ok = value.is_list() && (value.items().size() == 3 || (allow_alpha && value.items().size() == 4));
+    if (!size_ok) {
+        report.add("APPEARANCE_LIST", path + " must be a list of 3 or 4 numbers", Severity::Error, path);
+        return;
+    }
+    for (const auto& component : value.items()) {
+        if (!component.is_number()) {
+            report.add("APPEARANCE_VALUE", path + " must contain numbers", Severity::Error, path);
+            return;
+        }
+        double c = component.as_double();
+        if (c < 0.0 || c > 1.0) {
+            report.add("APPEARANCE_RANGE", path + " components must be between 0 and 1", Severity::Error, path);
+            return;
+        }
+    }
+}
+
+void Validator::validate_texture(ValidationReport& report, const Value& block, const std::string& path) const {
+    if (!block.is_map()) {
+        report.add("TEXTURE_INVALID", path + " must be a mapping", Severity::Error, path);
+        return;
+    }
+    const Value* ref = block.field("Ref");
+    std::string ref_text = ref != nullptr && ref->is_string() ? ref->string_value : std::string();
+    if (ref_text.empty()) {
+        report.add("TEXTURE_REF_MISSING", path + ".Ref is required", Severity::Error, path + ".Ref");
+    } else if (!asset_checker_ && !reference_checker_) {
+        report.add("TEXTURE_UNCHECKED", path + ".Ref not resolved (no resolver): '" + ref_text + "'", Severity::Info,
+                   path + ".Ref");
+    } else {
+        bool ok = asset_checker_ ? asset_checker_(ref_text) : reference_checker_(ref_text);
+        if (!ok) {
+            report.add("TEXTURE_UNRESOLVED", path + ".Ref cannot be resolved: '" + ref_text + "'", Severity::Error,
+                       path + ".Ref");
+        }
+    }
+    for (const char* uv : {"UVScale", "UVOffset"}) {
+        const Value* value = block.field(uv);
+        if (value == nullptr) continue;
+        bool ok = value->is_list() && value->items().size() == 2;
+        if (ok) {
+            for (const auto& item : value->items()) {
+                if (!item.is_number()) {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        if (!ok) {
+            report.add("TEXTURE_UV", std::string(path) + "." + uv + " must be two numbers", Severity::Error,
+                       std::string(path) + "." + uv);
+        }
+    }
+    const Value* uv_set = block.field("UVSet");
+    if (uv_set != nullptr && (!uv_set->is_int() || uv_set->int_value < 0)) {
+        report.add("TEXTURE_UV", path + ".UVSet must be a non-negative integer", Severity::Error, path + ".UVSet");
+    }
+}
+
+void Validator::validate_appearance(ValidationReport& report, const Value& section, const std::string& prefix) const {
+    if (!section.is_map()) return;
+    for (const auto& field : appearance_fields()) {
+        const Value* value = section.field(field);
+        if (value == nullptr) continue;
+        std::string path = prefix + "." + field;
+        if (field == "BaseColor") {
+            validate_color(report, *value, path, true);
+        } else if (field == "EmissionColor") {
+            validate_color(report, *value, path, false);
+        } else if (field == "AlphaMode") {
+            if (!(value->is_string() && in_list(alpha_modes(), value->string_value))) {
+                report.add("APPEARANCE_ENUM", path + " is not a valid alpha mode", Severity::Error, path);
+            }
+        } else if (field == "DoubleSided") {
+            if (!value->is_bool()) {
+                report.add("APPEARANCE_VALUE", path + " must be a boolean", Severity::Error, path);
+            }
+        } else if (field == "EmissionStrength" || field == "NormalScale") {
+            validate_number(report, *value, path, true, 0.0, false, 0.0, "APPEARANCE");
+        } else {
+            validate_number(report, *value, path, true, 0.0, true, 1.0, "APPEARANCE");
+        }
+    }
+    const Value* textures = section.field("Textures");
+    if (textures != nullptr && textures->is_map()) {
+        for (const auto& slot : texture_slots()) {
+            const Value* block = textures->field(slot);
+            if (block != nullptr) validate_texture(report, *block, prefix + ".Textures." + slot);
+        }
+    }
+}
+
+void Validator::validate_contact(ValidationReport& report, const Value& section, const std::string& prefix) const {
+    if (!section.is_map()) return;
+    for (const auto& field : contact_fields()) {
+        const Value* value = section.field(field);
+        if (value == nullptr) continue;
+        std::string path = prefix + "." + field;
+        if (field == "FrictionCombine" || field == "RestitutionCombine") {
+            if (!(value->is_string() && in_list(combine_modes(), value->string_value))) {
+                report.add("CONTACT_ENUM", path + " is not a valid combine mode", Severity::Error, path);
+            }
+        } else if (field == "Restitution") {
+            validate_number(report, *value, path, true, 0.0, true, 1.0, "CONTACT");
+        } else {
+            validate_number(report, *value, path, true, 0.0, false, 0.0, "CONTACT");
+        }
+    }
+}
+
+void Validator::validate_contact_pairs(ValidationReport& report, const Value& section,
+                                       const std::string& prefix) const {
+    std::vector<Value> entries;
+    if (section.is_map()) {
+        entries.push_back(section);
+    } else if (section.is_list()) {
+        entries = section.items();
+    } else {
+        return;
+    }
+    int index = 0;
+    for (const auto& entry : entries) {
+        std::string path = prefix + "[" + std::to_string(index) + "]";
+        ++index;
+        if (!entry.is_map()) {
+            report.add("CONTACT_PAIR_INVALID", path + " must be a mapping", Severity::Error, path);
+            continue;
+        }
+        std::string other;
+        for (const char* key : {"Other", "Material", "Ref"}) {
+            const Value* value = entry.field(key);
+            if (value != nullptr && value->is_string() && !value->string_value.empty()) {
+                other = value->string_value;
+                break;
+            }
+        }
+        if (other.empty()) {
+            report.add("CONTACT_PAIR_REF_MISSING", path + ".Other is required", Severity::Error, path + ".Other");
+        } else if (reference_checker_ && !reference_checker_(other)) {
+            report.add("CONTACT_PAIR_UNRESOLVED", path + ".Other cannot be resolved: '" + other + "'", Severity::Error,
+                       path + ".Other");
+        }
+        if (entry.field("StaticFriction") != nullptr) {
+            validate_number(report, *entry.field("StaticFriction"), path + ".StaticFriction", true, 0.0, false, 0.0,
+                            "CONTACT");
+        }
+        if (entry.field("DynamicFriction") != nullptr) {
+            validate_number(report, *entry.field("DynamicFriction"), path + ".DynamicFriction", true, 0.0, false, 0.0,
+                            "CONTACT");
+        }
+        if (entry.field("Restitution") != nullptr) {
+            validate_number(report, *entry.field("Restitution"), path + ".Restitution", true, 0.0, true, 1.0,
+                            "CONTACT");
+        }
+    }
+}
+
 ValidationReport Validator::validate_material(const Document& document) const {
     MaterialDefinition material = read_material(document);
     std::string subject = !material.identity.id.empty() ? material.identity.id
@@ -408,6 +618,26 @@ ValidationReport Validator::validate_material(const Document& document) const {
             if (profile.is_map() && profile.fields().empty()) {
                 report.add("PROFILE_EMPTY", "composition profile '" + entry.first + "' is empty", Severity::Warning,
                            "CompositionProfiles." + entry.first);
+            }
+        }
+    }
+
+    const Value* appearance = section(document.sections, "Appearance");
+    if (appearance != nullptr) validate_appearance(report, *appearance, "Appearance");
+    const Value* contact = section(document.sections, "Contact");
+    if (contact != nullptr) validate_contact(report, *contact, "Contact");
+    const Value* contact_pairs = section(document.sections, "ContactPairs");
+    if (contact_pairs != nullptr) validate_contact_pairs(report, *contact_pairs, "ContactPairs");
+    if (material.variants.is_map()) {
+        for (const auto& entry : material.variants.fields()) {
+            if (!entry.second.is_map()) continue;
+            const Value* variant_appearance = entry.second.field("Appearance");
+            if (variant_appearance != nullptr && variant_appearance->is_map()) {
+                validate_appearance(report, *variant_appearance, "Variants." + entry.first + ".Appearance");
+            }
+            const Value* variant_contact = entry.second.field("Contact");
+            if (variant_contact != nullptr && variant_contact->is_map()) {
+                validate_contact(report, *variant_contact, "Variants." + entry.first + ".Contact");
             }
         }
     }

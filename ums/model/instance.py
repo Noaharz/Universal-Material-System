@@ -13,6 +13,22 @@ from typing import Any, Dict, List, Optional
 
 from .base import as_str, quantity_map
 
+KNOWN_SECTIONS = {
+    "Version",
+    "Identity",
+    "Id",
+    "Name",
+    "Definition",
+    "BaseMaterial",
+    "Material",
+    "Variant",
+    "Components",
+    "State",
+    "Parameters",
+    "Appearance",
+    "Contact",
+}
+
 
 @dataclass
 class MixComponent:
@@ -39,6 +55,9 @@ class MaterialInstance:
     state: Dict[str, Any] = field(default_factory=dict)
     parameters: Dict[str, Any] = field(default_factory=dict)
     components: List[MixComponent] = field(default_factory=list)
+    appearance: Optional[Dict[str, Any]] = None
+    contact: Optional[Dict[str, Any]] = None
+    extra: Dict[str, Any] = field(default_factory=dict)
     source_path: Optional[str] = None
 
     def get_state(self, name: str) -> Any:
@@ -84,6 +103,9 @@ class MaterialInstance:
             state=quantity_map(sections.get("State")),
             parameters=quantity_map(sections.get("Parameters")),
             components=components,
+            appearance=sections.get("Appearance") if isinstance(sections.get("Appearance"), dict) else None,
+            contact=sections.get("Contact") if isinstance(sections.get("Contact"), dict) else None,
+            extra={k: v for k, v in sections.items() if k not in KNOWN_SECTIONS},
             source_path=source_path,
         )
 
@@ -114,6 +136,12 @@ class MaterialInstance:
             sections["State"] = {k: scalar_to_primitive(v) for k, v in self.state.items()}
         if self.parameters:
             sections["Parameters"] = {k: scalar_to_primitive(v) for k, v in self.parameters.items()}
+        if self.appearance:
+            sections["Appearance"] = self.appearance
+        if self.contact:
+            sections["Contact"] = self.contact
+        for key, value in self.extra.items():
+            sections[key] = value
         return sections
 
     def to_dict(self) -> Dict[str, Any]:
@@ -126,6 +154,9 @@ class MaterialInstance:
             "state": {k: str(v) for k, v in self.state.items()},
             "parameters": {k: str(v) for k, v in self.parameters.items()},
             "components": [c.to_dict() for c in self.components],
+            "appearance": self.appearance,
+            "contact": self.contact,
+            "extra": self.extra,
             "source_path": self.source_path,
         }
 

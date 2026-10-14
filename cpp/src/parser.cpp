@@ -360,4 +360,37 @@ Document parse_buffer(const char* data, std::size_t size, const std::string& pat
     return parse_document(std::string_view(data, size), path);
 }
 
+namespace {
+
+Diagnostic diagnostic_from_exception(const std::exception& error, const std::string& path) {
+    Diagnostic diagnostic;
+    diagnostic.code = "PARSE_ERROR";
+    diagnostic.message = error.what();
+    diagnostic.path = path;
+    if (const auto* parse_error = dynamic_cast<const ParseError*>(&error)) {
+        diagnostic.line = parse_error->line();
+        diagnostic.column = parse_error->column();
+        if (!parse_error->path().empty()) diagnostic.path = parse_error->path();
+    }
+    return diagnostic;
+}
+
+}  // namespace
+
+DocumentResult try_parse_document(std::string_view text, const std::string& path) {
+    try {
+        return DocumentResult::ok(parse_document(text, path));
+    } catch (const ParseError& error) {
+        Diagnostic diagnostic = diagnostic_from_exception(error, path);
+        diagnostic.code = "PARSE_ERROR";
+        return DocumentResult::fail(std::move(diagnostic));
+    } catch (const std::exception& error) {
+        return DocumentResult::fail(diagnostic_from_exception(error, path));
+    }
+}
+
+DocumentResult try_parse_buffer(const char* data, std::size_t size, const std::string& path) {
+    return try_parse_document(std::string_view(data, size), path);
+}
+
 }  // namespace ums

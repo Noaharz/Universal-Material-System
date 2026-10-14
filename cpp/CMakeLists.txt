@@ -14,6 +14,7 @@ set(UMS_CORE_SOURCES
     src/registry.cpp
     src/serializer.cpp
     src/validation.cpp
+    src/writer.cpp
 )
 
 add_library(ums STATIC ${UMS_CORE_SOURCES})

@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.manganese"
+    Name: "Manganese"
+    Symbol: "Mn"
+    AtomicNumber: 25
+
+Properties:
+    AtomicMass: 54.938044 u
+    AtomicRadius: 127 pm
+    CovalentRadius: 139 pm
+    IonizationEnergy: 7.434 eV
+    Electronegativity: 1.55
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d5 4s2"
+    ValenceElectrons: 2
+
+References:
+    DataSource: "periodic_table_reference"

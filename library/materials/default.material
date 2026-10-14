@@ -1,0 +1,25 @@
+MATERIAL
+
+Version: 1
+
+Identity:
+    Id: "material.default"
+    Name: "Default"
+    Category: "Generic"
+
+Appearance:
+    BaseColor: [0.8, 0.8, 0.8, 1.0]
+    Metallic: 0
+    Roughness: 0.5
+    AlphaMode: Opaque
+    DoubleSided: false
+
+Contact:
+    StaticFriction: 0.6
+    DynamicFriction: 0.5
+    Restitution: 0.1
+    FrictionCombine: GeometricMean
+    RestitutionCombine: Maximum
+
+Properties:
+    Density: 1000 kg/m^3

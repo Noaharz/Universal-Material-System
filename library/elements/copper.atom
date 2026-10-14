@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.copper"
+    Name: "Copper"
+    Symbol: "Cu"
+    AtomicNumber: 29
+
+Properties:
+    AtomicMass: 63.546 u
+    AtomicRadius: 128 pm
+    CovalentRadius: 132 pm
+    IonizationEnergy: 7.726 eV
+    Electronegativity: 1.90
+
+Electronic:
+    ElectronConfiguration: "[Ar] 3d10 4s1"
+    ValenceElectrons: 1
+
+References:
+    DataSource: "periodic_table_reference"

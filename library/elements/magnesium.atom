@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.magnesium"
+    Name: "Magnesium"
+    Symbol: "Mg"
+    AtomicNumber: 12
+
+Properties:
+    AtomicMass: 24.305 u
+    AtomicRadius: 160 pm
+    CovalentRadius: 141 pm
+    IonizationEnergy: 7.646 eV
+    Electronegativity: 1.31
+
+Electronic:
+    ElectronConfiguration: "[Ne] 3s2"
+    ValenceElectrons: 2
+
+References:
+    DataSource: "periodic_table_reference"

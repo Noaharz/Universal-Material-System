@@ -14,6 +14,14 @@ Versions must be present and `>= 1`.
 * References never encode a version in the path; the resource manager resolves
   the version that is present in the library.
 
+## 2.1 Additive sections
+
+The `Appearance` and `Contact` sections (and `ContactPairs`) were added as
+optional, backwards-compatible sections. Documents that do not use them stay at
+`Version: 1`. Unknown sections and unknown fields are preserved on load and
+written back on save, so a newer writer does not silently drop data that an
+older reader does not understand.
+
 ## 3. Controlled updates
 
 When a definition changes:

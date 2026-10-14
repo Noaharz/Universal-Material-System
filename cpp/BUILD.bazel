@@ -1,0 +1,65 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+# Filesystem-free core. Build with --define=ums_no_filesystem=true to drop the
+# file/scanning layers (matching the CMake UMS_NO_FILESYSTEM option).
+config_setting(
+    name = "no_filesystem",
+    values = {"define": "ums_no_filesystem = true"},
+)
+
+CORE_SRCS = [
+    "src/parser.cpp",
+    "src/reader.cpp",
+    "src/registry.cpp",
+    "src/serializer.cpp",
+    "src/units.cpp",
+    "src/validation.cpp",
+    "src/writer.cpp",
+]
+
+FS_SRCS = [
+    "src/fileio.cpp",
+    "src/library.cpp",
+]
+
+cc_library(
+    name = "ums",
+    srcs = CORE_SRCS + select({
+        ":no_filesystem": [],
+        "//conditions:default": FS_SRCS,
+    }),
+    hdrs = glob(["include/ums/*.hpp"]),
+    copts = ["-std=c++20"],
+    defines = select({
+        ":no_filesystem": ["UMS_NO_FILESYSTEM"],
+        "//conditions:default": [],
+    }),
+    includes = ["include"],
+)
+
+# The command line tools require the filesystem layer.
+cc_binary(
+    name = "umsdump",
+    srcs = ["tools/umsdump.cpp"],
+    deps = [":ums"],
+)
+
+cc_binary(
+    name = "umsconf",
+    srcs = ["tools/umsconf.cpp"],
+    deps = [":ums"],
+)
+
+cc_test(
+    name = "core_test",
+    srcs = ["tests/core_test.cpp"],
+    deps = [":ums"],
+)
+
+cc_test(
+    name = "reader_test",
+    srcs = ["tests/reader_test.cpp"],
+    deps = [":ums"],
+)

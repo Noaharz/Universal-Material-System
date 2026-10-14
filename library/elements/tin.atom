@@ -1,0 +1,23 @@
+ATOM
+
+Version: 1
+
+Identity:
+    Id: "element.tin"
+    Name: "Tin"
+    Symbol: "Sn"
+    AtomicNumber: 50
+
+Properties:
+    AtomicMass: 118.710 u
+    AtomicRadius: 145 pm
+    CovalentRadius: 139 pm
+    IonizationEnergy: 7.344 eV
+    Electronegativity: 1.96
+
+Electronic:
+    ElectronConfiguration: "[Kr] 4d10 5s2 5p2"
+    ValenceElectrons: 4
+
+References:
+    DataSource: "periodic_table_reference"
